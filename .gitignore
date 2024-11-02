@@ -1,0 +1,10 @@
+*.iml
+*.zip
+.idea
+venv
+/build/
+/dist/
+__pycache__/
+/.coverage
+/coverage.xml
+/junit/
