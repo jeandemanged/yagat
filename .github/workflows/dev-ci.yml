@@ -2,6 +2,13 @@ name: Dev CI
 
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      upload_artifacts:
+        description: 'Upload build artifacts'
+        required: true
+        default: false
+        type: boolean
 
 permissions: { }
 
@@ -50,3 +57,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build application with PyInstaller
+        run: pyinstaller -y yagat.spec
+
+      - name: Upload application Artifact
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: yagat-${{ matrix.os }}
+          path: dist/yagat*
