@@ -15,6 +15,8 @@ from yagat.app_context import AppContext
 
 class TestListener:
 
+    __test__ = False
+
     def __init__(self, context: AppContext):
         self._status_text_from_listener = None
         self._network_from_listener = None
