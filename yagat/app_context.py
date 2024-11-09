@@ -91,7 +91,7 @@ class AppContext:
 
     @selection.setter
     def selection(self, value: tuple[Optional[str], Optional[str], Optional[ns.Connection]]) -> None:
-        logging.info(f'selection setter called {value}')
+        logging.info(f'selection setter called {value[0]},{value[1]}')
         self._selection = value
         self.notify_selection_changed()
 
