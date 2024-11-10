@@ -67,7 +67,7 @@ YAGAT today lacks many features, but you may already find it useful. What is pla
 - **Grid Model Updates**: Adjust grid configurations, such as opening/closing switches, changing generator set points, etc.
 - **Load Flow**:
   - Add ability to save/load the Load Flow parameters
-  - View Load Flow reports for troubleshooting non-convergence
+  - View Load Flow reports in order to troubleshoot e.g. non-convergence
 
 ### Future Plans:
 - **Security Analysis**:

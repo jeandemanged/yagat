@@ -20,6 +20,7 @@ from yagat.app_context import AppContext
 class LoadFlowParametersView(tk.Frame):
 
     def sheet_modified(self, event):
+        # FIXME: handling of invalid values
         if event.eventname == 'edit_table':
             row = event.selected.row
             column = event.selected.column
@@ -30,6 +31,8 @@ class LoadFlowParametersView(tk.Frame):
                 lf_parameters.distributed_slack = new_value
             elif param == 'balanceType':
                 lf_parameters.balance_type = BalanceType.__members__[new_value]
+            elif param == 'countriesToBalance':
+                lf_parameters.countries_to_balance = str(new_value).split(',')
             elif param == 'voltageInitMode':
                 lf_parameters.voltage_init_mode = VoltageInitMode.__members__[new_value]
             elif param == 'readSlackBus':
@@ -83,6 +86,11 @@ class LoadFlowParametersView(tk.Frame):
             set_value=self.context.lf_parameters.balance_type.name
         )
         self.sheet.set_index_data(r=i_row, value='balanceType')
+
+        i_row += 1
+        self.sheet[i_row, 0].data = 'Countries to balance'
+        self.sheet[i_row, 1].data = ''
+        self.sheet.set_index_data(r=i_row, value='countriesToBalance')
 
         i_row += 1
         self.sheet[i_row, 0].data = 'Voltage Initialization Mode'
@@ -179,13 +187,13 @@ class LoadFlowParametersView(tk.Frame):
                 else:
                     self.sheet[i_row, i_col].data = param_default
             elif param_type == 'STRING_LIST':
-                if param_possible_values:
-                    self.sheet[i_row, i_col].dropdown(
-                        values=param_possible_values,
-                        set_value=param_default,
-                    )
-                else:
-                    self.sheet[i_row, i_col].data = ''
+                # FIXME: make use of param_possible_values.
+                #  tksheet does not support multiple selection in dropdown.
+                #  also careful of OLF param where order is significant such as voltageTargetPriorities.
+                if param_default.startswith('[') and param_default.endswith(']'):
+                    # clean it, we should fix this in OLF
+                    param_default = param_default[1:-1]
+                self.sheet[i_row, i_col].data = param_default
             elif param_type == 'INTEGER':
                 self.sheet[i_row, i_col].data = param_default
                 self.sheet.format_cell(i_row, i_col, formatter_options=tks.int_formatter())
