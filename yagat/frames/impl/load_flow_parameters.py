@@ -64,7 +64,19 @@ class LoadFlowParametersView(tk.Frame):
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.sheet = tks.Sheet(self)
-        self.sheet.enable_bindings()
+        self.sheet.enable_bindings('edit_cell',
+                                   'single_select',
+                                   'drag_select',
+                                   'row_select',
+                                   'column_select',
+                                   'copy',
+                                   'column_width_resize',
+                                   'double_click_column_resize',
+                                   'double_click_row_resize',
+                                   'row_width_resize',
+                                   'column_height_resize',
+                                   'arrowkeys',
+                                   )
         self.sheet.bind("<<SheetModified>>", self.sheet_modified)
         self.context = context
         self.variables = []
