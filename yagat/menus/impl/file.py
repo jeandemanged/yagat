@@ -81,4 +81,3 @@ class FileMenu(tk.Menu):
             self.context.status_text = 'Opening ' + filename
             self.context.network = pp.network.load(filename)
             self.context.status_text = 'Network ' + self.context.network.name + ' loaded'
-            print(self.context.network.get_sub_networks(all_attributes=True))

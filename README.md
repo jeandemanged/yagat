@@ -66,7 +66,6 @@ YAGAT today lacks many features, but you may already find it useful. What is pla
 - **Grid Model Navigation**: Tabular views per equipment type
 - **Grid Model Updates**: Adjust grid configurations, such as opening/closing switches, changing generator set points, etc.
 - **Load Flow**:
-  - Complete Load Flow Parameters view
   - Add ability to save/load the Load Flow parameters
   - View Load Flow reports for troubleshooting non-convergence
 
@@ -79,10 +78,11 @@ YAGAT today lacks many features, but you may already find it useful. What is pla
 ## Under the Hood
 
 YAGAT is:
-- **Written in Python**: A versatile language that allows easy integration with other libraries.
+- **Written in Python**: a high-level, general-purpose programming language.
 - **Using [PyPowSyBl](https://pypowsybl.readthedocs.io/en/latest/index.html)**: Provides the core grid analysis functionalities.
-- **Using [Tkinter](https://wiki.python.org/moin/TkInter)**: Supplies the graphical user interface, enabling an intuitive experience for users.
-- **Using [PyInstaller](https://pyinstaller.org/en/stable/)**: Packages the application for cross-platform compatibility.
+- **Using [Tkinter](https://wiki.python.org/moin/TkInter)**: Supplies the graphical user interface.
+- **Using [Tksheet](https://github.com/ragardner/tksheet)**: An amazing tkinter table widget.
+- **Using [PyInstaller](https://pyinstaller.org/en/stable/)**: Packages the application.
 
 ## Data Confidentiality
 

@@ -23,8 +23,6 @@ class RunMenu(tk.Menu):
         self.add_command(label='Load Flow', command=self.run_load_flow)
 
     def run_load_flow(self):
-        print(lf.get_provider_parameters())
-        print(lf.Parameters())
         reporter = pr.Reporter()
         self.context.status_text = 'Starting Load Flow'
         results = lf.run_ac(self.context.network, parameters=self.context.lf_parameters, reporter=reporter)
