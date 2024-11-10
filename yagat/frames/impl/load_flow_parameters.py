@@ -63,7 +63,7 @@ class LoadFlowParametersView(tk.Frame):
 
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.sheet = tks.Sheet(self)
+        self.sheet = tks.Sheet(self, index_align='left')
         self.sheet.enable_bindings('edit_cell',
                                    'single_select',
                                    'drag_select',
