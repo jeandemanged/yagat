@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 import platform
+import shutil
 import sys
 
 sys.path.append('./')
@@ -52,6 +53,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+release_name=f'yagat_{__version__}_{platform.system()}'
 coll = COLLECT(
     exe,
     a.binaries,
@@ -59,5 +61,7 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f'yagat_{__version__}_{platform.system()}',
+    name=release_name,
 )
+print(f'Zipping release into {release_name}.zip')
+shutil.make_archive(f'{release_name}', 'zip', f'dist/{release_name}')
