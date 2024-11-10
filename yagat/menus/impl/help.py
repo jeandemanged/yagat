@@ -20,5 +20,7 @@ class HelpMenu(tk.Menu):
         self.parent = parent
         parent.add_cascade(label="Help", menu=self)
         self.add_command(label='About...', command=lambda: showinfo('About YAGAT',
-                                                                    'YAGAT v' + yagat.__version__ +
+                                                                    'Yet Another Grid Analysis Tool' +
+                                                                    '\nhttps://github.com/jeandemanged/yagat/wiki' +
+                                                                    '\nYAGAT v' + yagat.__version__ +
                                                                     '\nBased on PyPowSyBl v' + pypowsybl.__version__))
