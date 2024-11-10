@@ -9,6 +9,9 @@ on:
         required: true
         default: false
         type: boolean
+  release:
+    types:
+      - published
 
 permissions: { }
 
@@ -67,3 +70,9 @@ jobs:
         with:
           name: yagat-${{ matrix.os }}
           path: dist/yagat*
+
+      - name: Upload release package
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v2.0.9
+        with:
+          files: yagat_*_.zip
