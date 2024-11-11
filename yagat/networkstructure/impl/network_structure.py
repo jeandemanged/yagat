@@ -105,6 +105,14 @@ class NetworkStructure:
     def buses(self) -> pd.DataFrame:
         return self._buses_df
 
+    @property
+    def generators(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.GENERATOR]
+
+    @property
+    def loads(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.LOAD]
+
     def refresh(self):
         logging.info('refresh start')
         self._substations_df = self._network.get_substations(all_attributes=True)

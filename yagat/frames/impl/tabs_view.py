@@ -13,6 +13,8 @@ import pypowsybl.network as pn
 from yagat.app_context import AppContext
 from yagat.frames.impl.diagram_view_bus import DiagramViewBus
 from yagat.frames.impl.bus_list_view import BusListView
+from yagat.frames.impl.generator_list_view import GeneratorListView
+from yagat.frames.impl.load_list_view import LoadListView
 from yagat.networkstructure import BusView
 
 
@@ -34,8 +36,18 @@ class TabsView(tk.Frame):
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
         # Bus List view tab
-        self.tab_bus_list = BusListView(self.tab_control, context, 'Bus list')
+        self.tab_bus_list = BusListView(self.tab_control, context)
         self.tab_control.add(self.tab_bus_list, text=self.tab_bus_list.tab_name)
+        self.tab_control.pack(expand=True, fill=tk.BOTH)
+
+        # Generators List view tab
+        self.tab_gen_list = GeneratorListView(self.tab_control, context)
+        self.tab_control.add(self.tab_gen_list, text=self.tab_gen_list.tab_name)
+        self.tab_control.pack(expand=True, fill=tk.BOTH)
+
+        # Loads List view tab
+        self.tab_load_list = LoadListView(self.tab_control, context)
+        self.tab_control.add(self.tab_load_list, text=self.tab_load_list.tab_name)
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
     def on_tab_changed(self):

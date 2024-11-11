@@ -16,7 +16,7 @@ from yagat.app_context import AppContext
 from yagat.networkstructure import Connection
 
 
-class BusListView(tk.Frame):
+class GeneratorListView(tk.Frame):
 
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -41,22 +41,22 @@ class BusListView(tk.Frame):
         self.sheet.pack(fill="both", expand=True)
 
     def on_selection_changed(self, selection: tuple[Optional[str], Optional[str], Optional[Connection]]):
-        buses = self.context.network_structure.buses
+        generators = self.context.network_structure.generators
         voltage_levels = []
         if selection[0] == 'voltage_level':
             voltage_levels = [selection[1]]
         elif selection[0] == 'substation':
             voltage_levels = [vl.voltage_level_id for vl in self.context.network_structure.get_substation(selection[1]).voltage_levels]
         if voltage_levels:
-            buses = buses.loc[buses['voltage_level_id'].isin(voltage_levels)]
-        self.sheet.data = [l.tolist() for l in buses.to_numpy()]
-        self.sheet.set_index_data(buses.index.tolist())
-        self.sheet.set_header_data(buses.columns)
+            generators = generators.loc[generators['voltage_level_id'].isin(voltage_levels)]
+        self.sheet.data = [l.tolist() for l in generators.to_numpy()]
+        self.sheet.set_index_data(generators.index.tolist())
+        self.sheet.set_header_data(generators.columns)
         self.sheet.set_all_cell_sizes_to_text()
 
     @property
     def tab_name(self) -> str:
-        return 'Bus list'
+        return 'Generator list'
 
 
 if __name__ == "__main__":
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         windll.shcore.SetProcessDpiAwareness(2)
     root = tk.Tk()
     ctx = AppContext(root)
-    bw = BusListView(root, ctx)
+    bw = GeneratorListView(root, ctx)
     bw.pack(fill="both", expand=True)
     ctx.network = pn.create_ieee9()
     ctx.selection = 'S1'
