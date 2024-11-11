@@ -12,15 +12,16 @@ import pypowsybl.network as pn
 
 from yagat.app_context import AppContext
 from yagat.frames.impl.diagram_view_bus import DiagramViewBus
+from yagat.frames.impl.bus_list_view import BusListView
 from yagat.networkstructure import BusView
 
 
-class DiagramView(tk.Frame):
+class TabsView(tk.Frame):
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.context = context
         self.tab_control = ttk.Notebook(self)
-        self.tab_control.bind("<<NotebookTabChanged>>", lambda _: self.on_tab_changed())
+        self.tab_control.bind('<<NotebookTabChanged>>', lambda _: self.on_tab_changed())
 
         # Bus-Breaker view tab
         self.tab_bus_breaker = DiagramViewBus(self.tab_control, context, 'Bus-Breaker View', BusView.BUS_BREAKER)
@@ -32,14 +33,19 @@ class DiagramView(tk.Frame):
         self.tab_control.add(self.tab_bus_branch, text=self.tab_bus_branch.tab_name)
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
+        # Bus List view tab
+        self.tab_bus_list = BusListView(self.tab_control, context, 'Bus list')
+        self.tab_control.add(self.tab_bus_list, text=self.tab_bus_list.tab_name)
+        self.tab_control.pack(expand=True, fill=tk.BOTH)
+
     def on_tab_changed(self):
-        self.context.selected_tab = self.tab_control.tab(self.tab_control.select(), "text")
+        self.context.selected_tab = self.tab_control.tab(self.tab_control.select(), 'text')
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     ctx = AppContext(root)
-    DiagramView(root, ctx).pack(fill="both", expand=True)
+    TabsView(root, ctx).pack(fill="both", expand=True)
     ctx.network = pn.create_ieee9()
     ctx.selection = 'S1'
     root.mainloop()

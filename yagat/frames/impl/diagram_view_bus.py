@@ -46,7 +46,7 @@ class DiagramViewBus(VerticalScrolledFrame):
         return self._tab_name
 
     def on_selection_changed(self, selection: tuple[Optional[str], Optional[str], Optional[Connection]]):
-        _, selection_id, selection_connection = selection
+        selection_type, selection_id, selection_connection = selection
         selected_connection_y = 0
         if self.context.selected_tab != self.tab_name:
             return
@@ -54,6 +54,8 @@ class DiagramViewBus(VerticalScrolledFrame):
         for w in self.widgets:
             w.destroy()
         self.widgets = []
+        if selection_type not in ['substation', 'voltage_level']:
+            return
         if not selection_id:
             return
         if self.context.selected_tab != self.tab_name:

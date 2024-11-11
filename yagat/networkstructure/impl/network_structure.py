@@ -101,6 +101,10 @@ class NetworkStructure:
     def network(self) -> pn.Network:
         return self._network
 
+    @property
+    def buses(self) -> pd.DataFrame:
+        return self._buses_df
+
     def refresh(self):
         logging.info('refresh start')
         self._substations_df = self._network.get_substations(all_attributes=True)
