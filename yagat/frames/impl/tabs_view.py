@@ -24,6 +24,7 @@ from yagat.frames.impl.shunt_compensator_list_view import ShuntCompensatorListVi
 from yagat.frames.impl.static_var_compensator_list_view import StaticVarCompensatorListView
 from yagat.frames.impl.lcc_list_view import LccListView
 from yagat.frames.impl.vsc_list_view import VscListView
+from yagat.frames.impl.switch_list_view import SwitchListView
 from yagat.networkstructure import BusView
 
 
@@ -48,6 +49,7 @@ class TabsView(tk.Frame):
         self._add_tab(StaticVarCompensatorListView(self.tab_control, self.context))
         self._add_tab(LccListView(self.tab_control, self.context))
         self._add_tab(VscListView(self.tab_control, self.context))
+        self._add_tab(SwitchListView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
