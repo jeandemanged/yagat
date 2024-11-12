@@ -118,6 +118,14 @@ class NetworkStructure:
     def loads(self) -> pd.DataFrame:
         return self._injections_df[ns.EquipmentType.LOAD]
 
+    @property
+    def lines(self) -> pd.DataFrame:
+        return self._branches_df[ns.EquipmentType.LINE]
+
+    @property
+    def two_windings_transformers(self) -> pd.DataFrame:
+        return self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER]
+
     def refresh(self):
         logging.info('refresh start')
         self._substations_df = self._network.get_substations(all_attributes=True)

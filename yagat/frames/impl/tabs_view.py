@@ -16,6 +16,8 @@ from yagat.frames.impl.buses_bus_view_list_view import BusesListView
 from yagat.frames.impl.buses_bus_breaker_view_list_view import BusesBusBreakerViewListView
 from yagat.frames.impl.generator_list_view import GeneratorListView
 from yagat.frames.impl.load_list_view import LoadListView
+from yagat.frames.impl.line_list_view import LineListView
+from yagat.frames.impl.two_windings_transformer_list_view import TwoWindingsTransformerListView
 from yagat.networkstructure import BusView
 
 
@@ -49,6 +51,13 @@ class TabsView(tk.Frame):
         # Loads List view tab
         self.tab_load_list = LoadListView(self.tab_control, context)
         self.tab_control.add(self.tab_load_list, text=self.tab_load_list.tab_name)
+
+        # Lines List view tab
+        self.tab_lines_list = LineListView(self.tab_control, context)
+        self.tab_control.add(self.tab_lines_list, text=self.tab_lines_list.tab_name)
+
+        self.tab_t2wt_list = TwoWindingsTransformerListView(self.tab_control, context)
+        self.tab_control.add(self.tab_t2wt_list, text=self.tab_t2wt_list.tab_name)
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
