@@ -139,6 +139,14 @@ class NetworkStructure:
         return self._injections_df[ns.EquipmentType.STATIC_VAR_COMPENSATOR]
 
     @property
+    def lcc_hvdc(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.LCC_CONVERTER_STATION]
+
+    @property
+    def vsc_hvdc(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.VSC_CONVERTER_STATION]
+
+    @property
     def three_windings_transformers(self) -> pd.DataFrame:
         return self._three_windings_transformers_df
 
