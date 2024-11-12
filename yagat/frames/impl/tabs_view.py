@@ -28,38 +28,20 @@ class TabsView(tk.Frame):
         self.tab_control = ttk.Notebook(self)
         self.tab_control.bind('<<NotebookTabChanged>>', lambda _: self.on_tab_changed())
 
-        # Bus-Breaker view tab
-        self.tab_bus_breaker = DiagramViewBus(self.tab_control, context, 'Bus/Breaker View', BusView.BUS_BREAKER)
-        self.tab_control.add(self.tab_bus_breaker, text=self.tab_bus_breaker.tab_name)
-
-        # Bus-Branch view tab
-        self.tab_bus_branch = DiagramViewBus(self.tab_control, context, 'Bus View', BusView.BUS_BRANCH)
-        self.tab_control.add(self.tab_bus_branch, text=self.tab_bus_branch.tab_name)
-
-        # Bus List view tab
-        self.tab_bus_list = BusesListView(self.tab_control, context)
-        self.tab_control.add(self.tab_bus_list, text=self.tab_bus_list.tab_name)
-
-        # Bus List view tab
-        self.tab_bus_bus_breaker_view_list = BusesBusBreakerViewListView(self.tab_control, context)
-        self.tab_control.add(self.tab_bus_bus_breaker_view_list, text=self.tab_bus_bus_breaker_view_list.tab_name)
-
-        # Generators List view tab
-        self.tab_gen_list = GeneratorListView(self.tab_control, context)
-        self.tab_control.add(self.tab_gen_list, text=self.tab_gen_list.tab_name)
-
-        # Loads List view tab
-        self.tab_load_list = LoadListView(self.tab_control, context)
-        self.tab_control.add(self.tab_load_list, text=self.tab_load_list.tab_name)
-
-        # Lines List view tab
-        self.tab_lines_list = LineListView(self.tab_control, context)
-        self.tab_control.add(self.tab_lines_list, text=self.tab_lines_list.tab_name)
-
-        self.tab_t2wt_list = TwoWindingsTransformerListView(self.tab_control, context)
-        self.tab_control.add(self.tab_t2wt_list, text=self.tab_t2wt_list.tab_name)
+        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus/Breaker View', BusView.BUS_BREAKER))
+        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus View', BusView.BUS_BRANCH))
+        self._add_tab(BusesListView(self.tab_control, self.context))
+        self._add_tab(BusesBusBreakerViewListView(self.tab_control, self.context))
+        self._add_tab(GeneratorListView(self.tab_control, self.context))
+        self._add_tab(LoadListView(self.tab_control, self.context))
+        self._add_tab(LineListView(self.tab_control, self.context))
+        self._add_tab(TwoWindingsTransformerListView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
+
+    def _add_tab(self, tab):
+        self.tab_control.add(tab, text=tab.tab_name)
+
 
     def on_tab_changed(self):
         self.context.selected_tab = self.tab_control.tab(self.tab_control.select(), 'text')
