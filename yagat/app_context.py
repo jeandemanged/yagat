@@ -67,14 +67,6 @@ class AppContext:
     def network(self) -> Optional[pn.Network]:
         return self._network
 
-    @property
-    def lf_parameters(self) -> lf.Parameters:
-        return self._lf_parameters
-
-    @property
-    def network_structure(self) -> Optional[ns.NetworkStructure]:
-        return self._network_structure
-
     @network.setter
     def network(self, new_network: Optional[pn.Network]) -> None:
         self._network = new_network
@@ -84,6 +76,14 @@ class AppContext:
             self._network_structure = None
         self.selection = (None, None, None)
         self.notify_network_changed()
+
+    @property
+    def lf_parameters(self) -> lf.Parameters:
+        return self._lf_parameters
+
+    @property
+    def network_structure(self) -> Optional[ns.NetworkStructure]:
+        return self._network_structure
 
     @property
     def selection(self) -> tuple[Optional[str], Optional[str], Optional[ns.Connection]]:
