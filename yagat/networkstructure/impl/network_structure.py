@@ -127,6 +127,10 @@ class NetworkStructure:
         return self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER]
 
     @property
+    def dangling_lines(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.DANGLING_LINE]
+
+    @property
     def three_windings_transformers(self) -> pd.DataFrame:
         return self._three_windings_transformers_df
 

@@ -19,6 +19,7 @@ from yagat.frames.impl.load_list_view import LoadListView
 from yagat.frames.impl.line_list_view import LineListView
 from yagat.frames.impl.two_windings_transformer_list_view import TwoWindingsTransformerListView
 from yagat.frames.impl.three_windings_transformer_list_view import ThreeWindingsTransformerListView
+from yagat.frames.impl.dangling_line_list_view import DanglingLineListView
 from yagat.networkstructure import BusView
 
 
@@ -38,6 +39,7 @@ class TabsView(tk.Frame):
         self._add_tab(LineListView(self.tab_control, self.context))
         self._add_tab(TwoWindingsTransformerListView(self.tab_control, self.context))
         self._add_tab(ThreeWindingsTransformerListView(self.tab_control, self.context))
+        self._add_tab(DanglingLineListView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
