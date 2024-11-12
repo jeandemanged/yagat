@@ -8,7 +8,7 @@
 import tkinter as tk
 
 from yagat.app_context import AppContext
-from yagat.frames.impl.diagram_view import DiagramView
+from yagat.frames.impl.tabs_view import TabsView
 from yagat.frames.impl.tree_view import TreeView
 
 
@@ -22,7 +22,7 @@ class TreeAndDiagram(tk.Frame):
                                            sashpad=4, sashwidth=8)
 
         self.tree_view = TreeView(self.paned_window, self.context)
-        self.right_frame = DiagramView(self.paned_window, self.context)
+        self.right_frame = TabsView(self.paned_window, self.context)
 
         self.paned_window.add(self.tree_view)
         self.paned_window.add(self.right_frame)

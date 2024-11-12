@@ -137,7 +137,8 @@ class TreeView(tk.Frame):
         self.tree_parent = None
         if not network:
             return
-        self.tree_parent = self.tree.insert('', 'end', text=network.name, open=True)
+        self.tree_parent = self.tree.insert('', 'end', text=network.name,
+                                            values=['network', network.id], open=True)
 
         for substation in self.context.network_structure.substations:
             node = self.tree.insert(self.tree_parent, "end", text=f"{substation.name} ({substation.substation_id})",
@@ -157,7 +158,7 @@ class TreeView(tk.Frame):
     def on_tree_select(self, event):
         tree = event.widget
         selection = [tree.item(item)["values"] for item in tree.selection()]
-        if selection and selection[0] != '' and selection[0][1] != self.context.selection[1]:
+        if selection and selection[0][1] != self.context.selection[1]:
             self.context.selection = (selection[0][0], selection[0][1], None)
 
 
