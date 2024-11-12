@@ -26,6 +26,7 @@ from yagat.frames.impl.lcc_list_view import LccListView
 from yagat.frames.impl.vsc_list_view import VscListView
 from yagat.frames.impl.switch_list_view import SwitchListView
 from yagat.frames.impl.tie_line_view import TieLineView
+from yagat.frames.impl.hvdc_line_view import HvdcLineView
 from yagat.networkstructure import BusView
 
 
@@ -52,6 +53,7 @@ class TabsView(tk.Frame):
         self._add_tab(VscListView(self.tab_control, self.context))
         self._add_tab(SwitchListView(self.tab_control, self.context))
         self._add_tab(TieLineView(self.tab_control, self.context))
+        self._add_tab(HvdcLineView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
