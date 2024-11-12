@@ -60,6 +60,8 @@ YAGAT is then available for your platform in the `dist` directory.
 - **Run the Load Flow**: Select `Run` | `Load Flow` to execute the analysis.
   - Once completed, view the solved bus voltages and branch flows for insights into the grid's state.
 
+![yagat quickstart](https://github.com/user-attachments/assets/57aad269-4e02-4a34-aba7-2c7906ab0e26)
+
 ## Roadmap
 
 YAGAT today lacks many features, but you may already find it useful. What is planned for the future is:
