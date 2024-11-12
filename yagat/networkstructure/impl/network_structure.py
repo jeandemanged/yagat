@@ -135,6 +135,10 @@ class NetworkStructure:
         return self._injections_df[ns.EquipmentType.SHUNT_COMPENSATOR]
 
     @property
+    def static_var_compensators(self) -> pd.DataFrame:
+        return self._injections_df[ns.EquipmentType.STATIC_VAR_COMPENSATOR]
+
+    @property
     def three_windings_transformers(self) -> pd.DataFrame:
         return self._three_windings_transformers_df
 

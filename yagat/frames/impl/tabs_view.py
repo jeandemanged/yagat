@@ -21,6 +21,7 @@ from yagat.frames.impl.two_windings_transformer_list_view import TwoWindingsTran
 from yagat.frames.impl.three_windings_transformer_list_view import ThreeWindingsTransformerListView
 from yagat.frames.impl.dangling_line_list_view import DanglingLineListView
 from yagat.frames.impl.shunt_compensator_list_view import ShuntCompensatorListView
+from yagat.frames.impl.static_var_compensator_list_view import StaticVarCompensatorListView
 from yagat.networkstructure import BusView
 
 
@@ -42,6 +43,7 @@ class TabsView(tk.Frame):
         self._add_tab(ThreeWindingsTransformerListView(self.tab_control, self.context))
         self._add_tab(DanglingLineListView(self.tab_control, self.context))
         self._add_tab(ShuntCompensatorListView(self.tab_control, self.context))
+        self._add_tab(StaticVarCompensatorListView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
