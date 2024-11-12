@@ -126,6 +126,10 @@ class NetworkStructure:
     def two_windings_transformers(self) -> pd.DataFrame:
         return self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER]
 
+    @property
+    def three_windings_transformers(self) -> pd.DataFrame:
+        return self._three_windings_transformers_df
+
     def refresh(self):
         logging.info('refresh start')
         self._substations_df = self._network.get_substations(all_attributes=True)
