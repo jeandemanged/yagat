@@ -154,6 +154,14 @@ class NetworkStructure:
     def switches(self) -> pd.DataFrame:
         return self._switches_df
 
+    @property
+    def tie_lines(self) -> pd.DataFrame:
+        return self._tie_lines_df
+
+    @property
+    def hvdc_lines(self) -> pd.DataFrame:
+        return self._hvdc_lines_df
+
     def refresh(self):
         logging.info('refresh start')
         self._substations_df = self._network.get_substations(all_attributes=True)

@@ -14,6 +14,7 @@ import pypowsybl.network as pn
 from yagat.app_context import AppContext
 
 
+
 class FileMenu(tk.Menu):
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Menu.__init__(self, parent, *args, **kwargs)
@@ -36,6 +37,13 @@ class FileMenu(tk.Menu):
             context.network = network
             context.status_text = 'Network ' + network.name + ' loaded'
 
+        def load_be_nl():
+            be = pn.create_micro_grid_be_network()
+            be.merge(pn.create_micro_grid_nl_network())
+            context.network = be
+            context.status_text = 'Network CGMES MicroGrid BE+NL loaded'
+
+
         self.sample_networks_menu.add_command(label='IEEE 9 Bus',
                                               command=lambda: load_sample_network(pn.create_ieee9()))
         self.sample_networks_menu.add_command(label='IEEE 14 Bus',
@@ -52,6 +60,8 @@ class FileMenu(tk.Menu):
                                               command=lambda: load_sample_network(pn.create_micro_grid_be_network()))
         self.sample_networks_menu.add_command(label='CGMES MicroGrid NL',
                                               command=lambda: load_sample_network(pn.create_micro_grid_nl_network()))
+        self.sample_networks_menu.add_command(label='CGMES MicroGrid BE+NL',
+                                              command=lambda: load_be_nl())
         self.sample_networks_menu.add_command(label='PowSyBl Metrix 6 Bus', command=lambda: load_sample_network(
             pn.create_metrix_tutorial_six_buses_network()))
         self.sample_networks_menu.add_command(label='Eurostag Tutorial', command=lambda: load_sample_network(
