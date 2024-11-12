@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import pypowsybl.network as pn
@@ -19,7 +19,7 @@ class NetworkStructure:
         self._network: pn.Network = network
         self._substations: Dict[str, ns.Substation] = {}
         self._voltage_levels: Dict[str, ns.VoltageLevel] = {}
-        self._connections: Dict[(str, Optional[int]), ns.Connection] = {}
+        self._connections: Dict[Tuple[str, Optional[int]], ns.Connection] = {}
 
         self._substations_df: pd.DataFrame = pd.DataFrame()
         self._voltage_levels_df: pd.DataFrame = pd.DataFrame()
@@ -29,6 +29,7 @@ class NetworkStructure:
         self._three_windings_transformers_df: pd.DataFrame = pd.DataFrame()
         self._tie_lines_df: pd.DataFrame = pd.DataFrame()
         self._buses_df: pd.DataFrame = pd.DataFrame()
+        self._buses_bus_breaker_view_df: pd.DataFrame = pd.DataFrame()
         self._switches_df: pd.DataFrame = pd.DataFrame()
         self._hvdc_lines_df: pd.DataFrame = pd.DataFrame()
 
@@ -106,6 +107,10 @@ class NetworkStructure:
         return self._buses_df
 
     @property
+    def buses_bus_breaker_view(self) -> pd.DataFrame:
+        return self._buses_bus_breaker_view_df
+
+    @property
     def generators(self) -> pd.DataFrame:
         return self._injections_df[ns.EquipmentType.GENERATOR]
 
@@ -135,6 +140,7 @@ class NetworkStructure:
         self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = self._network.get_2_windings_transformers(
             all_attributes=True)
         self._buses_df = self._network.get_buses(all_attributes=True)
+        self._buses_bus_breaker_view_df = self._network.get_bus_breaker_view_buses(all_attributes=True)
         self._linear_shunt_compensator_sections_df = self._network.get_linear_shunt_compensator_sections(
             all_attributes=True)
         self._non_linear_shunt_compensator_sections_df = self._network.get_non_linear_shunt_compensator_sections(
@@ -200,10 +206,10 @@ class NetworkStructure:
             return self._connections[(connection_id, side)]
         return None
 
-    def get_voltage_level_data(self, voltage_level: 'ns.VoltageLevel') -> pd.Series:
+    def get_voltage_level_data(self, voltage_level: 'ns.VoltageLevel') -> pd.DataFrame:
         return self._voltage_levels_df.loc[voltage_level.voltage_level_id]
 
-    def get_connection_data(self, connection_id: str, side: Optional[int]) -> pd.Series:
+    def get_connection_data(self, connection_id: str, side: Optional[int]) -> pd.DataFrame:
         connection = self._connections[(connection_id, side)]
         if not connection:
             return pd.Series()
@@ -235,12 +241,12 @@ class NetworkStructure:
     def is_retained(self, connection: ns.Connection) -> bool:
         if connection.equipment_type != ns.EquipmentType.SWITCH:
             raise RuntimeError('Not a switch')
-        return self._switches_df.loc[connection.equipment_id]['retained']
+        return bool(self._switches_df.loc[connection.equipment_id]['retained'])
 
     def is_open(self, connection: ns.Connection) -> bool:
         if connection.equipment_type != ns.EquipmentType.SWITCH:
             raise RuntimeError('Not a switch')
-        return self._switches_df.loc[connection.equipment_id]['open']
+        return bool(self._switches_df.loc[connection.equipment_id]['open'])
 
     def get_other_sides(self, connection: ns.Connection) -> List[ns.Connection]:
         if connection.equipment_type in ns.EquipmentType.branch_types() or connection.equipment_type == ns.EquipmentType.SWITCH:

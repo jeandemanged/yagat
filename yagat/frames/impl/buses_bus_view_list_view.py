@@ -15,14 +15,14 @@ from yagat.app_context import AppContext
 from yagat.frames.impl.base_list_view import BaseListView
 
 
-class BusListView(BaseListView):
+class BusesListView(BaseListView):
 
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         BaseListView.__init__(self, parent, context, *args, **kwargs)
 
     @property
     def tab_name(self) -> str:
-        return 'Bus list'
+        return 'Buses (Bus View)'
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.buses
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         windll.shcore.SetProcessDpiAwareness(2)
     root = tk.Tk()
     ctx = AppContext(root)
-    bw = BusListView(root, ctx)
+    bw = BusesListView(root, ctx)
     bw.pack(fill="both", expand=True)
     ctx.network = pn.create_ieee9()
     ctx.selection = ('network', '', None)

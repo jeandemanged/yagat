@@ -12,7 +12,8 @@ import pypowsybl.network as pn
 
 from yagat.app_context import AppContext
 from yagat.frames.impl.diagram_view_bus import DiagramViewBus
-from yagat.frames.impl.bus_list_view import BusListView
+from yagat.frames.impl.buses_bus_view_list_view import BusesListView
+from yagat.frames.impl.buses_bus_breaker_view_list_view import BusesBusBreakerViewListView
 from yagat.frames.impl.generator_list_view import GeneratorListView
 from yagat.frames.impl.load_list_view import LoadListView
 from yagat.networkstructure import BusView
@@ -26,28 +27,29 @@ class TabsView(tk.Frame):
         self.tab_control.bind('<<NotebookTabChanged>>', lambda _: self.on_tab_changed())
 
         # Bus-Breaker view tab
-        self.tab_bus_breaker = DiagramViewBus(self.tab_control, context, 'Bus-Breaker View', BusView.BUS_BREAKER)
+        self.tab_bus_breaker = DiagramViewBus(self.tab_control, context, 'Bus/Breaker View', BusView.BUS_BREAKER)
         self.tab_control.add(self.tab_bus_breaker, text=self.tab_bus_breaker.tab_name)
-        self.tab_control.pack(expand=True, fill=tk.BOTH)
 
         # Bus-Branch view tab
-        self.tab_bus_branch = DiagramViewBus(self.tab_control, context, 'Bus-Branch View', BusView.BUS_BRANCH)
+        self.tab_bus_branch = DiagramViewBus(self.tab_control, context, 'Bus View', BusView.BUS_BRANCH)
         self.tab_control.add(self.tab_bus_branch, text=self.tab_bus_branch.tab_name)
-        self.tab_control.pack(expand=True, fill=tk.BOTH)
 
         # Bus List view tab
-        self.tab_bus_list = BusListView(self.tab_control, context)
+        self.tab_bus_list = BusesListView(self.tab_control, context)
         self.tab_control.add(self.tab_bus_list, text=self.tab_bus_list.tab_name)
-        self.tab_control.pack(expand=True, fill=tk.BOTH)
+
+        # Bus List view tab
+        self.tab_bus_bus_breaker_view_list = BusesBusBreakerViewListView(self.tab_control, context)
+        self.tab_control.add(self.tab_bus_bus_breaker_view_list, text=self.tab_bus_bus_breaker_view_list.tab_name)
 
         # Generators List view tab
         self.tab_gen_list = GeneratorListView(self.tab_control, context)
         self.tab_control.add(self.tab_gen_list, text=self.tab_gen_list.tab_name)
-        self.tab_control.pack(expand=True, fill=tk.BOTH)
 
         # Loads List view tab
         self.tab_load_list = LoadListView(self.tab_control, context)
         self.tab_control.add(self.tab_load_list, text=self.tab_load_list.tab_name)
+
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
     def on_tab_changed(self):
@@ -59,5 +61,5 @@ if __name__ == "__main__":
     ctx = AppContext(root)
     TabsView(root, ctx).pack(fill="both", expand=True)
     ctx.network = pn.create_ieee9()
-    ctx.selection = 'S1'
+    ctx.selection = ('substation', 'S1', None)
     root.mainloop()

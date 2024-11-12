@@ -22,7 +22,7 @@ class GeneratorListView(BaseListView):
 
     @property
     def tab_name(self) -> str:
-        return 'Generator list'
+        return 'Generators'
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.generators
