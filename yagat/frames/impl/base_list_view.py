@@ -35,6 +35,7 @@ class BaseListView(tk.Frame, ABC):
                                    )
         self.context = context
         self.context.add_selection_changed_listener(self.on_selection_changed)
+        self.context.add_tab_changed_listener(lambda _: self.on_selection_changed(self.context.selection))
 
         self.sheet.set_index_width(300)
         self.sheet.pack(fill="both", expand=True)
@@ -53,8 +54,10 @@ class BaseListView(tk.Frame, ABC):
         pass
 
     def on_selection_changed(self, selection: tuple[Optional[str], Optional[str], Optional[Connection]]):
+        if self.context.selected_tab != self.tab_name:
+            return
+        self.sheet.reset()
         if not self.context.network_structure:
-            self.sheet.data = []
             return
         df = self.get_data_frame()
         voltage_levels = self.filtered_voltage_levels(selection)
@@ -63,7 +66,6 @@ class BaseListView(tk.Frame, ABC):
         self.sheet.data = [l.tolist() for l in df.to_numpy()]
         self.sheet.set_index_data(df.index.tolist())
         self.sheet.set_header_data(df.columns)
-        self.sheet.set_all_cell_sizes_to_text()
 
     def filtered_voltage_levels(self,
                                 selection: tuple[Optional[str], Optional[str], Optional[Connection]]) -> list[str]:
