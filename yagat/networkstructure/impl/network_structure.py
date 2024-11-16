@@ -13,6 +13,9 @@ import pypowsybl.network as pn
 
 import yagat.networkstructure as ns
 
+# workaround to filter abusive usage of property in CGMES importer causing too many columns
+CGMES_OPERATIONAL_LIMIT_SET = 'CGMES.OperationalLimitSet_'
+
 
 class NetworkStructure:
     def __init__(self, network: pn.Network):
@@ -164,31 +167,55 @@ class NetworkStructure:
 
     def refresh(self):
         logging.info('refresh start')
+        logging.info('get_substations...')
         self._substations_df = self._network.get_substations(all_attributes=True)
+        logging.info('get_voltage_levels...')
         self._voltage_levels_df = self._network.get_voltage_levels(all_attributes=True)
-        self._three_windings_transformers_df = self._network.get_3_windings_transformers(all_attributes=True)
+        logging.info('get_3_windings_transformers...')
+        df = self._network.get_3_windings_transformers(all_attributes=True)
+        logging.info('get_2_windings_transformers / CGMES.OperationalListSet filtering')
+        self._three_windings_transformers_df = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
+        logging.info('get_tie_lines...')
         self._tie_lines_df = self._network.get_tie_lines(all_attributes=True)
+        logging.info('get_switches...')
         self._switches_df = self._network.get_switches(all_attributes=True)
+        logging.info('get_loads...')
         self._injections_df[ns.EquipmentType.LOAD] = self._network.get_loads(all_attributes=True)
+        logging.info('get_generators...')
         self._injections_df[ns.EquipmentType.GENERATOR] = self._network.get_generators(all_attributes=True)
+        logging.info('get_dangling_lines...')
         self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(all_attributes=True)
+        logging.info('get_shunt_compensators...')
         self._injections_df[ns.EquipmentType.SHUNT_COMPENSATOR] = self._network.get_shunt_compensators(
             all_attributes=True)
+        logging.info('get_static_var_compensators...')
         self._injections_df[ns.EquipmentType.STATIC_VAR_COMPENSATOR] = self._network.get_static_var_compensators(
             all_attributes=True)
+        logging.info('get_lcc_converter_stations...')
         self._injections_df[ns.EquipmentType.LCC_CONVERTER_STATION] = self._network.get_lcc_converter_stations(
             all_attributes=True)
+        logging.info('get_vsc_converter_stations...')
         self._injections_df[ns.EquipmentType.VSC_CONVERTER_STATION] = self._network.get_vsc_converter_stations(
             all_attributes=True)
-        self._branches_df[ns.EquipmentType.LINE] = self._network.get_lines(all_attributes=True)
-        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = self._network.get_2_windings_transformers(
-            all_attributes=True)
+        logging.info('get_lines')
+        df = self._network.get_lines(all_attributes=True)
+        logging.info('get_lines / CGMES.OperationalListSet filtering')
+        self._branches_df[ns.EquipmentType.LINE] = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
+        logging.info('get_2_windings_transformers')
+        df = self._network.get_2_windings_transformers(all_attributes=True)
+        logging.info('get_2_windings_transformers / CGMES.OperationalListSet filtering')
+        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
+        logging.info('get_buses')
         self._buses_df = self._network.get_buses(all_attributes=True)
+        logging.info('get_bus_breaker_view_buses')
         self._buses_bus_breaker_view_df = self._network.get_bus_breaker_view_buses(all_attributes=True)
+        logging.info('get_linear_shunt_compensator_sections')
         self._linear_shunt_compensator_sections_df = self._network.get_linear_shunt_compensator_sections(
             all_attributes=True)
+        logging.info('get_non_linear_shunt_compensator_sections')
         self._non_linear_shunt_compensator_sections_df = self._network.get_non_linear_shunt_compensator_sections(
             all_attributes=True)
+        logging.info('get_hvdc_lines')
         self._hvdc_lines_df = self._network.get_hvdc_lines(all_attributes=True)
         logging.info('refresh end')
 
