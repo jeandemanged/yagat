@@ -5,6 +5,8 @@
 [![Actions Status](https://github.com/jeandemanged/yagat/workflows/CI/badge.svg)](https://github.com/jeandemanged/yagat/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeandemanged_yagat&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeandemanged_yagat)
 
+[![Release](https://img.shields.io/github/v/release/jeandemanged/yagat)](https://github.com/jeandemanged/yagat/releases/latest)
+
 ## Overview
 
 YAGAT provides a graphical user interface built on top of the [PowSyBl](https://www.powsybl.org) open source grid analysis libraries.

@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import pypowsybl.network as pn
@@ -35,6 +35,8 @@ class NetworkStructure:
 
         self._linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
         self._non_linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
+
+        self._bus_breaker_topology_cache: Dict[str, pn.BusBreakerTopology] = {}
 
         self.refresh()
 
@@ -164,31 +166,89 @@ class NetworkStructure:
 
     def refresh(self):
         logging.info('refresh start')
+
+        self._bus_breaker_topology_cache = {}
+
+        logging.info('get_substations...')
         self._substations_df = self._network.get_substations(all_attributes=True)
-        self._voltage_levels_df = self._network.get_voltage_levels(all_attributes=True)
-        self._three_windings_transformers_df = self._network.get_3_windings_transformers(all_attributes=True)
+
+        logging.info('get_voltage_levels...')
+        tmp = self._substations_df[['name', 'country']].rename(columns={'name': 'substation_name'})
+        self._voltage_levels_df = (self._network.get_voltage_levels(
+            attributes=['substation_id', 'name', 'nominal_v', 'low_voltage_limit', 'high_voltage_limit',
+                        'topology_kind'])
+                                   .reset_index()
+                                   .merge(tmp, left_on='substation_id', right_on='id', how='left')
+                                   .set_index('id'))[
+            ['name', 'country', 'substation_id', 'substation_name', 'nominal_v', 'low_voltage_limit',
+             'high_voltage_limit', 'topology_kind']]
+
+        logging.info('get_buses')
+        tmp = self._voltage_levels_df[
+            ['name', 'country', 'substation_id', 'substation_name', 'nominal_v', 'low_voltage_limit',
+             'high_voltage_limit']].rename(columns={'name': 'voltage_level_name'})
+        self._buses_df = (self._network.get_buses()
+                          .reset_index()
+                          .merge(tmp, left_on='voltage_level_id', right_on='id', how='left')
+                          .set_index('id'))
+
+        logging.info('get_bus_breaker_view_buses')
+        self._buses_bus_breaker_view_df = (self._network.get_bus_breaker_view_buses()
+                                           .reset_index()
+                                           .merge(tmp, left_on='voltage_level_id', right_on='id', how='left')
+                                           .set_index('id'))
+
+        logging.info('get_lines')
+        self._branches_df[ns.EquipmentType.LINE] = self._network.get_lines(
+            attributes=['name', 'connected1', 'connected2', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'bus1_id',
+                        'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id', 'bus_breaker_bus2_id',
+                        'voltage_level2_id'])
+
+        logging.info('get_2_windings_transformers')
+        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = self._network.get_2_windings_transformers(
+            attributes=['name', 'connected1', 'connected2', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'bus1_id',
+                        'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id', 'bus_breaker_bus2_id',
+                        'voltage_level2_id'])
+
+        logging.info('get_3_windings_transformers...')
+        self._three_windings_transformers_df = self._network.get_3_windings_transformers(
+            attributes=['name', 'connected1', 'connected2', 'connected3', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'p3',
+                        'q3', 'i3', 'bus1_id', 'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id',
+                        'bus_breaker_bus2_id', 'voltage_level2_id', 'bus3_id', 'bus_breaker_bus3_id',
+                        'voltage_level3_id'])
+
+        logging.info('get_tie_lines...')
         self._tie_lines_df = self._network.get_tie_lines(all_attributes=True)
+        logging.info('get_switches...')
         self._switches_df = self._network.get_switches(all_attributes=True)
+        logging.info('get_loads...')
         self._injections_df[ns.EquipmentType.LOAD] = self._network.get_loads(all_attributes=True)
+        logging.info('get_generators...')
         self._injections_df[ns.EquipmentType.GENERATOR] = self._network.get_generators(all_attributes=True)
-        self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(all_attributes=True)
+        logging.info('get_dangling_lines...')
+        self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(
+            attributes=['name', 'connected', 'p0', 'q0', 'p', 'q', 'i', 'boundary_p', 'boundary_q', 'boundary_v_mag',
+                        'boundary_v_angle', 'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'pairing_key', 'paired',
+                        'tie_line_id'])
+        logging.info('get_shunt_compensators...')
         self._injections_df[ns.EquipmentType.SHUNT_COMPENSATOR] = self._network.get_shunt_compensators(
             all_attributes=True)
+        logging.info('get_static_var_compensators...')
         self._injections_df[ns.EquipmentType.STATIC_VAR_COMPENSATOR] = self._network.get_static_var_compensators(
             all_attributes=True)
+        logging.info('get_lcc_converter_stations...')
         self._injections_df[ns.EquipmentType.LCC_CONVERTER_STATION] = self._network.get_lcc_converter_stations(
             all_attributes=True)
+        logging.info('get_vsc_converter_stations...')
         self._injections_df[ns.EquipmentType.VSC_CONVERTER_STATION] = self._network.get_vsc_converter_stations(
             all_attributes=True)
-        self._branches_df[ns.EquipmentType.LINE] = self._network.get_lines(all_attributes=True)
-        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = self._network.get_2_windings_transformers(
-            all_attributes=True)
-        self._buses_df = self._network.get_buses(all_attributes=True)
-        self._buses_bus_breaker_view_df = self._network.get_bus_breaker_view_buses(all_attributes=True)
+        logging.info('get_linear_shunt_compensator_sections')
         self._linear_shunt_compensator_sections_df = self._network.get_linear_shunt_compensator_sections(
             all_attributes=True)
+        logging.info('get_non_linear_shunt_compensator_sections')
         self._non_linear_shunt_compensator_sections_df = self._network.get_non_linear_shunt_compensator_sections(
             all_attributes=True)
+        logging.info('get_hvdc_lines')
         self._hvdc_lines_df = self._network.get_hvdc_lines(all_attributes=True)
         logging.info('refresh end')
 
@@ -233,10 +293,7 @@ class NetworkStructure:
             return self._voltage_levels[voltage_level_id]
         return None
 
-    def get_buses(self, voltage_level: 'ns.VoltageLevel') -> pd.DataFrame:
-        return self._buses_df.loc[self._buses_df['voltage_level_id'] == voltage_level.voltage_level_id]
-
-    def get_substation_or_voltage_level(self, object_id: str) -> '[ns.Substation, ns.VoltageLevel]':
+    def get_substation_or_voltage_level(self, object_id: str) -> 'Union[ns.Substation, ns.VoltageLevel]':
         substation = self.get_substation(object_id)
         if substation:
             return substation
@@ -314,10 +371,18 @@ class NetworkStructure:
     def _get_other_side_from_df(self, connection: ns.Connection, data_frame: pd.DataFrame, col1: str, col2: str) -> \
             List[ns.Connection]:
         for _, series in data_frame.iterrows():
-            eq1 = series[col1]
-            eq2 = series[col2]
+            eq1 = str(series[col1])
+            eq2 = str(series[col2])
             if connection.equipment_id == eq1:
                 return [self._connections[(eq2, None)]]
             elif connection.equipment_id == eq2:
                 return [self._connections[(eq1, None)]]
         return []
+
+    def get_bus_breaker_topology(self, voltage_level: 'ns.VoltageLevel') -> pn.BusBreakerTopology:
+        voltage_level_id: str = voltage_level.voltage_level_id
+        if voltage_level_id in self._bus_breaker_topology_cache:
+            return self._bus_breaker_topology_cache[voltage_level_id]
+        topo = self.network.get_bus_breaker_topology(voltage_level_id)
+        self._bus_breaker_topology_cache[voltage_level_id] = topo
+        return topo
