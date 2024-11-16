@@ -97,3 +97,6 @@ class Connection:
 
     def get_data(self) -> pd.DataFrame:
         return self.network_structure.get_connection_data(self.equipment_id, self.side)
+
+    def __repr__(self) -> str:
+        return f'Connection {self._equipment_type} {self._equipment_id} on side {self._side_char()}'
