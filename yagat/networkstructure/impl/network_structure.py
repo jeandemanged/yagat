@@ -13,9 +13,6 @@ import pypowsybl.network as pn
 
 import yagat.networkstructure as ns
 
-# workaround to filter abusive usage of property in CGMES importer causing too many columns
-CGMES_OPERATIONAL_LIMIT_SET = 'CGMES.OperationalLimitSet_'
-
 
 class NetworkStructure:
     def __init__(self, network: pn.Network):
@@ -167,14 +164,55 @@ class NetworkStructure:
 
     def refresh(self):
         logging.info('refresh start')
+
         logging.info('get_substations...')
         self._substations_df = self._network.get_substations(all_attributes=True)
+
         logging.info('get_voltage_levels...')
-        self._voltage_levels_df = self._network.get_voltage_levels(all_attributes=True)
+        tmp = self._substations_df[['name', 'country']].rename(columns={'name': 'substation_name'})
+        self._voltage_levels_df = (self._network.get_voltage_levels(
+            attributes=['substation_id', 'name', 'nominal_v', 'low_voltage_limit', 'high_voltage_limit',
+                        'topology_kind'])
+                                   .reset_index()
+                                   .merge(tmp, left_on='substation_id', right_on='id', how='left')
+                                   .set_index('id'))[
+            ['name', 'country', 'substation_id', 'substation_name', 'nominal_v', 'low_voltage_limit',
+             'high_voltage_limit', 'topology_kind']]
+
+        logging.info('get_buses')
+        tmp = self._voltage_levels_df[
+            ['name', 'country', 'substation_id', 'substation_name', 'nominal_v', 'low_voltage_limit',
+             'high_voltage_limit']].rename(columns={'name': 'voltage_level_name'})
+        self._buses_df = (self._network.get_buses()
+                          .reset_index()
+                          .merge(tmp, left_on='voltage_level_id', right_on='id', how='left')
+                          .set_index('id'))
+
+        logging.info('get_bus_breaker_view_buses')
+        self._buses_bus_breaker_view_df = (self._network.get_bus_breaker_view_buses()
+                                           .reset_index()
+                                           .merge(tmp, left_on='voltage_level_id', right_on='id', how='left')
+                                           .set_index('id'))
+
+        logging.info('get_lines')
+        self._branches_df[ns.EquipmentType.LINE] = self._network.get_lines(
+            attributes=['name', 'connected1', 'connected2', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'bus1_id',
+                        'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id', 'bus_breaker_bus2_id',
+                        'voltage_level2_id'])
+
+        logging.info('get_2_windings_transformers')
+        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = self._network.get_2_windings_transformers(
+            attributes=['name', 'connected1', 'connected2', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'bus1_id',
+                        'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id', 'bus_breaker_bus2_id',
+                        'voltage_level2_id'])
+
         logging.info('get_3_windings_transformers...')
-        df = self._network.get_3_windings_transformers(all_attributes=True)
-        logging.info('get_2_windings_transformers / CGMES.OperationalListSet filtering')
-        self._three_windings_transformers_df = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
+        self._three_windings_transformers_df = self._network.get_3_windings_transformers(
+            attributes=['name', 'connected1', 'connected2', 'connected3', 'p1', 'q1', 'i1', 'p2', 'q2', 'i2', 'p3',
+                        'q3', 'i3', 'bus1_id', 'bus_breaker_bus1_id', 'voltage_level1_id', 'bus2_id',
+                        'bus_breaker_bus2_id', 'voltage_level2_id', 'bus3_id', 'bus_breaker_bus3_id',
+                        'voltage_level3_id'])
+
         logging.info('get_tie_lines...')
         self._tie_lines_df = self._network.get_tie_lines(all_attributes=True)
         logging.info('get_switches...')
@@ -197,18 +235,6 @@ class NetworkStructure:
         logging.info('get_vsc_converter_stations...')
         self._injections_df[ns.EquipmentType.VSC_CONVERTER_STATION] = self._network.get_vsc_converter_stations(
             all_attributes=True)
-        logging.info('get_lines')
-        df = self._network.get_lines(all_attributes=True)
-        logging.info('get_lines / CGMES.OperationalListSet filtering')
-        self._branches_df[ns.EquipmentType.LINE] = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
-        logging.info('get_2_windings_transformers')
-        df = self._network.get_2_windings_transformers(all_attributes=True)
-        logging.info('get_2_windings_transformers / CGMES.OperationalListSet filtering')
-        self._branches_df[ns.EquipmentType.TWO_WINDINGS_TRANSFORMER] = df.loc[:, ~df.columns.str.startswith(CGMES_OPERATIONAL_LIMIT_SET)]
-        logging.info('get_buses')
-        self._buses_df = self._network.get_buses(all_attributes=True)
-        logging.info('get_bus_breaker_view_buses')
-        self._buses_bus_breaker_view_df = self._network.get_bus_breaker_view_buses(all_attributes=True)
         logging.info('get_linear_shunt_compensator_sections')
         self._linear_shunt_compensator_sections_df = self._network.get_linear_shunt_compensator_sections(
             all_attributes=True)
