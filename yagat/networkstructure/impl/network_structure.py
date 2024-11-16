@@ -226,7 +226,10 @@ class NetworkStructure:
         logging.info('get_generators...')
         self._injections_df[ns.EquipmentType.GENERATOR] = self._network.get_generators(all_attributes=True)
         logging.info('get_dangling_lines...')
-        self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(all_attributes=True)
+        self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(
+            attributes=['name', 'connected', 'p0', 'q0', 'p', 'q', 'i', 'boundary_p', 'boundary_q', 'boundary_v_mag',
+                        'boundary_v_angle', 'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'pairing_key', 'paired',
+                        'tie_line_id'])
         logging.info('get_shunt_compensators...')
         self._injections_df[ns.EquipmentType.SHUNT_COMPENSATOR] = self._network.get_shunt_compensators(
             all_attributes=True)
