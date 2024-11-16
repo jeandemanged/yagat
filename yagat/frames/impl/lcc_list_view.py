@@ -7,6 +7,7 @@
 #
 import os
 import tkinter as tk
+from typing import Any
 
 import pandas as pd
 import pypowsybl.network as pn
@@ -26,6 +27,9 @@ class LccListView(BaseListView):
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.lcc_hvdc
+
+    def on_entry(self, ident: str, column_name: str, new_value: Any):
+        return super().on_entry(ident, column_name, new_value)
 
     def filter_data_frame(self, df: pd.DataFrame, voltage_levels: list[str]) -> pd.DataFrame:
         return df.loc[df['voltage_level_id'].isin(voltage_levels)]

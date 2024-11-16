@@ -5,9 +5,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # SPDX-License-Identifier: MPL-2.0
 #
+import logging
 import tkinter as tk
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Callable, Any
 
 import pandas as pd
 import tksheet as tks
@@ -19,30 +20,35 @@ from yagat.networkstructure import Connection
 
 class BaseColumnFormat(ABC):
 
-    def __init__(self, column_name: str):
+    def __init__(self, column_name: str, editable: bool = False):
         self._column_name: str = column_name
+        self._editable: bool = editable
 
     @property
     def column_name(self) -> str:
         return self._column_name
 
+    @property
+    def editable(self) -> bool:
+        return self._editable
+
 
 class StringColumnFormat(BaseColumnFormat):
 
-    def __init__(self, column_name: str):
-        BaseColumnFormat.__init__(self, column_name)
+    def __init__(self, column_name: str, editable: bool = False):
+        BaseColumnFormat.__init__(self, column_name, editable)
 
 
 class IntegerColumnFormat(BaseColumnFormat):
 
-    def __init__(self, column_name: str):
-        BaseColumnFormat.__init__(self, column_name)
+    def __init__(self, column_name: str, editable: bool = False):
+        BaseColumnFormat.__init__(self, column_name, editable)
 
 
 class DoubleColumnFormat(BaseColumnFormat):
 
-    def __init__(self, column_name: str, precision: int):
-        BaseColumnFormat.__init__(self, column_name)
+    def __init__(self, column_name: str, editable: bool = False, precision: int = 0):
+        BaseColumnFormat.__init__(self, column_name, editable)
         self._precision: int = precision
 
     @property
@@ -52,14 +58,18 @@ class DoubleColumnFormat(BaseColumnFormat):
 
 class BooleanColumnFormat(BaseColumnFormat):
 
-    def __init__(self, column_name: str):
-        BaseColumnFormat.__init__(self, column_name)
+    def __init__(self, column_name: str, editable: bool = False):
+        BaseColumnFormat.__init__(self, column_name, editable)
 
 
+PRECISION_POWER = 1
+PRECISION_CURRENT = 1
+PRECISION_VOLTAGE = 2
+PRECISION_ANGLE = 5
 COLUMN_FORMATS = {
     'name': StringColumnFormat('name'),
-    'v_mag': DoubleColumnFormat('v_mag', 2),
-    'v_angle': DoubleColumnFormat('v_angle', 5),
+    'v_mag': DoubleColumnFormat('v_mag', precision=PRECISION_VOLTAGE),
+    'v_angle': DoubleColumnFormat('v_angle', precision=PRECISION_ANGLE),
     'connected_component': IntegerColumnFormat('connected_component'),
     'synchronous_component': IntegerColumnFormat('synchronous_component'),
     'voltage_level_id': StringColumnFormat('voltage_level_id'),
@@ -67,34 +77,34 @@ COLUMN_FORMATS = {
     'country': StringColumnFormat('country'),
     'substation_id': StringColumnFormat('substation_id'),
     'substation_name': StringColumnFormat('substation_name'),
-    'nominal_v': DoubleColumnFormat('nominal_v', 2),
-    'low_voltage_limit': DoubleColumnFormat('low_voltage_limit', 2),
-    'high_voltage_limit': DoubleColumnFormat('high_voltage_limit', 2),
-    'target_p': DoubleColumnFormat('target_p', 1),
-    'target_v': DoubleColumnFormat('target_v', 2),
-    'target_q': DoubleColumnFormat('target_q', 1),
-    'min_p': DoubleColumnFormat('min_p', 1),
-    'max_p': DoubleColumnFormat('max_p', 1),
-    'min_q': DoubleColumnFormat('min_q', 1),
-    'max_q': DoubleColumnFormat('max_q', 1),
-    'boundary_p': DoubleColumnFormat('boundary_p', 1),
-    'boundary_q': DoubleColumnFormat('boundary_q', 1),
-    'boundary_v_mag': DoubleColumnFormat('boundary_v_mag', 2),
-    'boundary_v_angle': DoubleColumnFormat('boundary_v_angle', 5),
-    'p0': DoubleColumnFormat('p0', 1),
-    'q0': DoubleColumnFormat('q0', 1),
-    'p': DoubleColumnFormat('p', 1),
-    'q': DoubleColumnFormat('q', 1),
-    'i': DoubleColumnFormat('i', 1),
-    'p1': DoubleColumnFormat('p1', 1),
-    'q1': DoubleColumnFormat('q1', 1),
-    'i1': DoubleColumnFormat('i1', 1),
-    'p2': DoubleColumnFormat('p2', 1),
-    'q2': DoubleColumnFormat('q2', 1),
-    'i2': DoubleColumnFormat('i2', 1),
-    'p3': DoubleColumnFormat('p3', 1),
-    'q3': DoubleColumnFormat('q3', 1),
-    'i3': DoubleColumnFormat('i3', 1),
+    'nominal_v': DoubleColumnFormat('nominal_v', precision=PRECISION_VOLTAGE),
+    'low_voltage_limit': DoubleColumnFormat('low_voltage_limit', precision=PRECISION_VOLTAGE),
+    'high_voltage_limit': DoubleColumnFormat('high_voltage_limit', precision=PRECISION_VOLTAGE),
+    'target_p': DoubleColumnFormat('target_p', precision=PRECISION_POWER, editable=True),
+    'target_v': DoubleColumnFormat('target_v', precision=PRECISION_VOLTAGE, editable=True),
+    'target_q': DoubleColumnFormat('target_q', precision=PRECISION_POWER, editable=True),
+    'min_p': DoubleColumnFormat('min_p', precision=PRECISION_POWER, editable=True),
+    'max_p': DoubleColumnFormat('max_p', precision=PRECISION_POWER, editable=True),
+    'min_q': DoubleColumnFormat('min_q', precision=PRECISION_POWER),
+    'max_q': DoubleColumnFormat('max_q', precision=PRECISION_POWER),
+    'boundary_p': DoubleColumnFormat('boundary_p', precision=PRECISION_POWER),
+    'boundary_q': DoubleColumnFormat('boundary_q', precision=PRECISION_POWER),
+    'boundary_v_mag': DoubleColumnFormat('boundary_v_mag', precision=PRECISION_VOLTAGE),
+    'boundary_v_angle': DoubleColumnFormat('boundary_v_angle', precision=PRECISION_ANGLE),
+    'p0': DoubleColumnFormat('p0', precision=PRECISION_POWER),
+    'q0': DoubleColumnFormat('q0', precision=PRECISION_POWER),
+    'p': DoubleColumnFormat('p', precision=PRECISION_POWER),
+    'q': DoubleColumnFormat('q', precision=PRECISION_POWER),
+    'i': DoubleColumnFormat('i', precision=PRECISION_CURRENT),
+    'p1': DoubleColumnFormat('p1', precision=PRECISION_POWER),
+    'q1': DoubleColumnFormat('q1', precision=PRECISION_POWER),
+    'i1': DoubleColumnFormat('i1', precision=PRECISION_CURRENT),
+    'p2': DoubleColumnFormat('p2', precision=PRECISION_POWER),
+    'q2': DoubleColumnFormat('q2', precision=PRECISION_POWER),
+    'i2': DoubleColumnFormat('i2', precision=PRECISION_CURRENT),
+    'p3': DoubleColumnFormat('p3', precision=PRECISION_POWER),
+    'q3': DoubleColumnFormat('q3', precision=PRECISION_POWER),
+    'i3': DoubleColumnFormat('i3', precision=PRECISION_CURRENT),
     'paired': BooleanColumnFormat('paired'),
     'fictitious': BooleanColumnFormat('fictitious'),
     'connected': BooleanColumnFormat('connected'),
@@ -103,16 +113,26 @@ COLUMN_FORMATS = {
     'connected3': BooleanColumnFormat('connected3'),
     'open': BooleanColumnFormat('open'),
     'retained': BooleanColumnFormat('retained'),
-    'voltage_regulator_on': BooleanColumnFormat('open'),
+    'voltage_regulator_on': BooleanColumnFormat('voltage_regulator_on', editable=True),
 }
 
 
 class BaseListView(tk.Frame, ABC):
 
+    def sheet_modified(self, event):
+        if event.eventname == 'edit_table':
+            row = event.selected.row
+            column = event.selected.column
+            new_value = self.sheet[row, column].data
+            ident = self.sheet.get_index_data(row)
+            column_name = self.sheet.get_header_data(column)
+            logging.info(f'updating "{ident}": {column_name} set to {new_value}')
+            self.on_entry(ident=ident, column_name=column_name, new_value=new_value)
+
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.sheet = tks.Sheet(self, index_align='left')
-        self.sheet.enable_bindings('single_select',
+        self.sheet.enable_bindings('edit_cell', 'single_select',
                                    'drag_select',
                                    'row_select',
                                    'column_select',
@@ -124,6 +144,7 @@ class BaseListView(tk.Frame, ABC):
                                    'column_height_resize',
                                    'arrowkeys',
                                    )
+        self.sheet.bind("<<SheetModified>>", self.sheet_modified)
         self.context = context
         self.context.add_selection_changed_listener(self.on_selection_changed)
         self.context.add_tab_changed_listener(lambda _: self.on_selection_changed(self.context.selection))
@@ -134,15 +155,19 @@ class BaseListView(tk.Frame, ABC):
     @property
     @abstractmethod
     def tab_name(self) -> str:
-        pass
+        return 'tab name'
 
     @abstractmethod
     def get_data_frame(self) -> pd.DataFrame:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def filter_data_frame(self, df: pd.DataFrame, voltage_levels: list[str]) -> pd.DataFrame:
-        pass
+        return df
+
+    @abstractmethod
+    def on_entry(self, ident: str, column_name: str, new_value: Any):
+        logging.warning('Update not implemented for this change')
 
     def on_selection_changed(self, selection: tuple[Optional[str], Optional[str], Optional[Connection]]):
         if self.context.selected_tab != self.tab_name:
@@ -158,10 +183,12 @@ class BaseListView(tk.Frame, ABC):
         self.sheet.set_index_data(df.index.tolist())
         self.sheet.set_header_data(df.columns)
         for idx, column_name in enumerate(df.columns):
+            col = self.sheet[num2alpha(idx)]
             if column_name not in COLUMN_FORMATS:
+                col.readonly(readonly=True)
                 continue
             col_format = COLUMN_FORMATS[column_name]
-            col = self.sheet[num2alpha(idx)]
+            col.readonly(readonly=not col_format.editable)
             if isinstance(col_format, StringColumnFormat):
                 continue
             elif isinstance(col_format, IntegerColumnFormat):
@@ -169,7 +196,8 @@ class BaseListView(tk.Frame, ABC):
             elif isinstance(col_format, DoubleColumnFormat):
                 col.format(float_formatter(decimals=col_format.precision))
             elif isinstance(col_format, BooleanColumnFormat):
-                col.checkbox(state='disabled')
+                state = 'normal' if col_format.editable else 'disabled'
+                col.checkbox(state=state)
 
     def filtered_voltage_levels(self,
                                 selection: tuple[Optional[str], Optional[str], Optional[Connection]]) -> list[str]:
