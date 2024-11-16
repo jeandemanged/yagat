@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import pypowsybl.network as pn
@@ -35,6 +35,8 @@ class NetworkStructure:
 
         self._linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
         self._non_linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
+
+        self._bus_breaker_topology_cache: Dict[str, pn.BusBreakerTopology] = {}
 
         self.refresh()
 
@@ -165,6 +167,8 @@ class NetworkStructure:
     def refresh(self):
         logging.info('refresh start')
 
+        self._bus_breaker_topology_cache = {}
+
         logging.info('get_substations...')
         self._substations_df = self._network.get_substations(all_attributes=True)
 
@@ -286,10 +290,7 @@ class NetworkStructure:
             return self._voltage_levels[voltage_level_id]
         return None
 
-    def get_buses(self, voltage_level: 'ns.VoltageLevel') -> pd.DataFrame:
-        return self._buses_df.loc[self._buses_df['voltage_level_id'] == voltage_level.voltage_level_id]
-
-    def get_substation_or_voltage_level(self, object_id: str) -> '[ns.Substation, ns.VoltageLevel]':
+    def get_substation_or_voltage_level(self, object_id: str) -> 'Union[ns.Substation, ns.VoltageLevel]':
         substation = self.get_substation(object_id)
         if substation:
             return substation
@@ -367,10 +368,18 @@ class NetworkStructure:
     def _get_other_side_from_df(self, connection: ns.Connection, data_frame: pd.DataFrame, col1: str, col2: str) -> \
             List[ns.Connection]:
         for _, series in data_frame.iterrows():
-            eq1 = series[col1]
-            eq2 = series[col2]
+            eq1 = str(series[col1])
+            eq2 = str(series[col2])
             if connection.equipment_id == eq1:
                 return [self._connections[(eq2, None)]]
             elif connection.equipment_id == eq2:
                 return [self._connections[(eq1, None)]]
         return []
+
+    def get_bus_breaker_topology(self, voltage_level: 'ns.VoltageLevel') -> pn.BusBreakerTopology:
+        voltage_level_id: str = voltage_level.voltage_level_id
+        if voltage_level_id in self._bus_breaker_topology_cache:
+            return self._bus_breaker_topology_cache[voltage_level_id]
+        topo = self.network.get_bus_breaker_topology(voltage_level_id)
+        self._bus_breaker_topology_cache[voltage_level_id] = topo
+        return topo

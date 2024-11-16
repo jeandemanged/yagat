@@ -39,7 +39,7 @@ class Connection:
         return self._equipment_type
 
     @property
-    def side(self) -> int:
+    def side(self) -> Optional[int]:
         return self._side
 
     @property
@@ -66,33 +66,34 @@ class Connection:
             elif bus_view == ns.BusView.BUS_BREAKER:
                 if self.network_structure.is_retained(self):
                     # omg
-                    return self.network_structure.network.get_bus_breaker_topology(self.voltage_level.voltage_level_id).switches.loc[self.equipment_id][f'bus{self._side_char()}_id']
+                    return str(self.network_structure.get_bus_breaker_topology(self.voltage_level).switches.loc[
+                                   self.equipment_id][f'bus{self._side_char()}_id'])
                 else:
                     return ''
         prefix = ''
         if bus_view == ns.BusView.BUS_BREAKER:
             prefix = 'bus_breaker_'
-        return self.get_data()[f'{prefix}bus{self._side_char()}_id']
+        return str(self.get_data()[f'{prefix}bus{self._side_char()}_id'])
 
     def get_p(self) -> float:
         if self.equipment_type == ns.EquipmentType.SWITCH:
             return math.nan
-        return self.get_data()[f'p{self._side_char()}']
+        return float(self.get_data()[f'p{self._side_char()}'])
 
     def get_q(self) -> float:
         if self.equipment_type == ns.EquipmentType.SWITCH:
             return math.nan
-        return self.get_data()[f'q{self._side_char()}']
+        return float(self.get_data()[f'q{self._side_char()}'])
 
     def get_i(self) -> float:
         if self.equipment_type == ns.EquipmentType.SWITCH:
             return math.nan
-        return self.get_data()[f'i{self._side_char()}']
+        return float(self.get_data()[f'i{self._side_char()}'])
 
     def get_connected(self) -> bool:
         if self.equipment_type == ns.EquipmentType.SWITCH:
             return True
-        return self.get_data()[f'connected{self._side_char()}']
+        return bool(self.get_data()[f'connected{self._side_char()}'])
 
-    def get_data(self) -> pd.Series:
+    def get_data(self) -> pd.DataFrame:
         return self.network_structure.get_connection_data(self.equipment_id, self.side)

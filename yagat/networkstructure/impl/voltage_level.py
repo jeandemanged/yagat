@@ -47,13 +47,13 @@ class VoltageLevel:
         return list(self._connections.values())
 
     def get_buses(self, bus_view: 'ns.BusView') -> pd.DataFrame:
-        bus_branch_buses = self.network_structure.get_buses(self)
+        df = None
         match bus_view:
             case ns.BusView.BUS_BRANCH:
-                return bus_branch_buses
+                df = self.network_structure.buses
             case ns.BusView.BUS_BREAKER:
-                return self.network_structure.network.get_bus_breaker_topology(self.voltage_level_id).buses.join(bus_branch_buses, on='bus_id', rsuffix='_ignore')
-
+                df = self.network_structure.buses_bus_breaker_view
+        return df.loc[df['voltage_level_id'] == self.voltage_level_id]
 
     def get_bus_connections(self, bus_view: 'ns.BusView', bus_id: str) -> List['ns.Connection']:
         bus_connections = [c for c in self._connections.values() if c.get_bus_id(bus_view) == bus_id]
@@ -64,5 +64,5 @@ class VoltageLevel:
             return self._connections[(connection_id, side)]
         return None
 
-    def get_data(self) -> pd.Series:
+    def get_data(self) -> pd.DataFrame:
         return self.network_structure.get_voltage_level_data(self)
