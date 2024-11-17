@@ -11,10 +11,11 @@
 
 YAGAT provides a graphical user interface built on top of the [PowSyBl](https://www.powsybl.org) open source grid analysis libraries.
 
-With YAGAT no computer science skill is required: just download the application and run it.
+With YAGAT, no programming skills are required: just download, unzip, and run – you're all set!
 
 Today with YAGAT you can:
 - Load grid models from the various formats supported by [PowSyBl](https://www.powsybl.org):
+  - PowSyBl native iIDM format
   - CIM/CGMES
   - UCTE-DEF
   - IEEE-CDF
@@ -25,13 +26,20 @@ Today with YAGAT you can:
 
 ## Installation
 
-### Binary releases
-
 Binary releases are provided for Windows, Linux and macOS on the [releases page](https://github.com/jeandemanged/yagat/releases).  
 No additional software is required for installation.  
 Download and extract the zip archive for your platform, then run YAGAT.
 
-### Building from source
+## Quick Start
+
+- **Open a sample network**: Go to `File` | `Open Sample network` | `IEEE 9 Bus` to load a sample grid model.
+- **Navigate the grid**: Use the tree view on the left to browse through the network model and its elements.
+- **Run the Load Flow**: Select `Run` | `Load Flow` to execute the analysis.
+  - Once completed, review the solved bus voltages and branch flows.
+
+![yagat quickstart](https://github.com/user-attachments/assets/a5ef2a20-13a8-44f5-b927-8d090d173d73)
+
+## Building from source
 
 With Python 3.12 and e.g. using a Virtual Environment and `pip`.
 
@@ -54,15 +62,6 @@ pyinstaller -y yagat.spec
 ```
 
 YAGAT is then available for your platform in the `dist` directory.
-
-## Quick Start
-
-- **Open a sample network**: Go to `File` | `Open Sample network` | `IEEE 9 Bus` to load a sample grid model.
-- **Navigate the grid**: Use the tree view on the left to browse through the network model and its elements.
-- **Run the Load Flow**: Select `Run` | `Load Flow` to execute the analysis.
-  - Once completed, view the solved bus voltages and branch flows for insights into the grid's state.
-
-![yagat quickstart](https://github.com/user-attachments/assets/57aad269-4e02-4a34-aba7-2c7906ab0e26)
 
 ## Roadmap
 
