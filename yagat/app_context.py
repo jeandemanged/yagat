@@ -23,13 +23,16 @@ class AppContext:
         self._network_structure: Optional[ns.NetworkStructure] = None
         self._selection: tuple[Optional[str], Optional[str], Optional[ns.Connection]] = (None, None, None)
         self._status_text: str = 'Welcome'
+        self._selected_tab_group: str = ''
         self._selected_tab: str = ''
         self._selected_view: str = ''
-        self.status_text_changed_listeners = []
-        self.network_changed_listeners = []
-        self.selection_changed_listeners = []
-        self.tab_changed_listeners = []
-        self.view_changed_listeners = []
+        self.status_text_changed_listeners: list[Callable[[str], None]] = []
+        self.network_changed_listeners: list[Callable[[Optional[pn.Network]], None]] = []
+        self.selection_changed_listeners: list[
+            Callable[[tuple[Optional[str], Optional[str], Optional[ns.Connection]]], None]] = []
+        self.tab_group_changed_listeners: list[Callable[[str], None]] = []
+        self.tab_changed_listeners: list[Callable[[str], None]] = []
+        self.view_changed_listeners: list[Callable[[str], None]] = []
 
     @property
     def tk_root(self) -> tk.Tk:
@@ -44,6 +47,15 @@ class AppContext:
         logging.info(value)
         self._status_text = value
         self.notify_status_text_changed()
+
+    @property
+    def selected_tab_group(self) -> str:
+        return self._selected_tab_group
+
+    @selected_tab_group.setter
+    def selected_tab_group(self, value: str) -> None:
+        self._selected_tab_group = value
+        self.notify_tab_group_changed()
 
     @property
     def selected_tab(self) -> str:
@@ -112,12 +124,21 @@ class AppContext:
         for listener in self.network_changed_listeners:
             listener(self.network)
 
-    def add_selection_changed_listener(self, listener: Callable[[tuple[Optional[str], Optional[str], Optional[ns.Connection]]], None]) -> None:
+    def add_selection_changed_listener(self,
+                                       listener: Callable[[tuple[Optional[str], Optional[str], Optional[
+                                           ns.Connection]]], None]) -> None:
         self.selection_changed_listeners.append(listener)
 
     def notify_selection_changed(self) -> None:
         for listener in self.selection_changed_listeners:
             listener(self.selection)
+
+    def add_tab_group_changed_listener(self, listener: Callable[[str], None]) -> None:
+        self.tab_group_changed_listeners.append(listener)
+
+    def notify_tab_group_changed(self) -> None:
+        for listener in self.tab_group_changed_listeners:
+            listener(self.selected_tab_group)
 
     def add_tab_changed_listener(self, listener: Callable[[str], None]) -> None:
         self.tab_changed_listeners.append(listener)

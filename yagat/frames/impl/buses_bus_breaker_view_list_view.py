@@ -25,6 +25,10 @@ class BusesBusBreakerViewListView(BaseListView):
     def tab_name(self) -> str:
         return 'Buses (Bus/Breaker View)'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Buses List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.buses_bus_breaker_view
 

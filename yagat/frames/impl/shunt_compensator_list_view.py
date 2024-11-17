@@ -25,6 +25,10 @@ class ShuntCompensatorListView(BaseListView):
     def tab_name(self) -> str:
         return 'Shunt Compensators'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Shunt Compensators List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.shunt_compensators
 

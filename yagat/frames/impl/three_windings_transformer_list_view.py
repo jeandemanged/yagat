@@ -23,7 +23,11 @@ class ThreeWindingsTransformerListView(BaseListView):
 
     @property
     def tab_name(self) -> str:
-        return '3W Transformers'
+        return 'Three Windings Transformers'
+
+    @property
+    def tab_group_name(self) -> str:
+        return 'Transformers List'
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.three_windings_transformers

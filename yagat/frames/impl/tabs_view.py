@@ -34,11 +34,13 @@ class TabsView(tk.Frame):
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.context = context
+        self.context.add_tab_group_changed_listener(self.on_tab_group_changed)
         self.tab_control = ttk.Notebook(self)
+        self._all_tabs = []
         self.tab_control.bind('<<NotebookTabChanged>>', lambda _: self.on_tab_changed())
 
-        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus/Breaker View', BusView.BUS_BREAKER))
-        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus View', BusView.BUS_BRANCH))
+        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus/Breaker View', BusView.BUS_BREAKER), hide=False)
+        self._add_tab(DiagramViewBus(self.tab_control, context, 'Bus View', BusView.BUS_BRANCH), hide=False)
         self._add_tab(BusesListView(self.tab_control, self.context))
         self._add_tab(BusesBusBreakerViewListView(self.tab_control, self.context))
         self._add_tab(GeneratorListView(self.tab_control, self.context))
@@ -57,9 +59,18 @@ class TabsView(tk.Frame):
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 
-    def _add_tab(self, tab):
+    def _add_tab(self, tab, hide=True):
         self.tab_control.add(tab, text=tab.tab_name)
+        if hide:
+            self.tab_control.hide(tab)
+        self._all_tabs.insert(0, tab)
 
+    def on_tab_group_changed(self, tab_group: str) -> None:
+        for t in self._all_tabs:
+            if t.tab_group_name == tab_group:
+                self.tab_control.select(t)
+            else:
+                self.tab_control.hide(t)
 
     def on_tab_changed(self):
         self.context.selected_tab = self.tab_control.tab(self.tab_control.select(), 'text')

@@ -17,12 +17,33 @@ class ViewMenu(tk.Menu):
         self.parent = parent
         self.context = context
         parent.add_cascade(label="View", menu=self)
-        self.add_command(label='Diagram', command=self.view_diagram)
+        self.add_command(label='Buses Diagram',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Buses Diagram'))
+        self.add_separator()
+        self.add_command(label='Buses',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Buses List'))
+        self.add_command(label='Generators',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Generators List'))
+        self.add_command(label='Loads',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Loads List'))
+        self.add_command(label='Lines',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Lines List'))
+        self.add_command(label='Transformers',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Transformers List'))
+        self.add_command(label='Shunt Compensators',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Shunt Compensators List'))
+        self.add_command(label='Static VAR Compensators',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Static VAR Compensators List'))
+        self.add_command(label='HVDC Lines and Converters',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'HVDC List'))
+        self.add_command(label='Switches',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Switches List'))
         self.add_separator()
         self.add_command(label='Load Flow Parameters', command=self.view_load_flow_parameters)
 
-    def view_diagram(self):
-        self.context.selected_view = 'Diagram'
+    def update_view_and_tab_group(self, view: str, tab_group: str) -> None:
+        self.context.selected_view = view
+        self.context.selected_tab_group = tab_group
 
     def view_load_flow_parameters(self):
         self.context.selected_view = 'LoadFlowParameters'

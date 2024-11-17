@@ -25,6 +25,10 @@ class GeneratorListView(BaseListView):
     def tab_name(self) -> str:
         return 'Generators'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Generators List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.generators
 
