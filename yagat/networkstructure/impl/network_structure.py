@@ -21,6 +21,8 @@ class NetworkStructure:
         self._voltage_levels: Dict[str, ns.VoltageLevel] = {}
         self._connections: Dict[Tuple[str, Optional[int]], ns.Connection] = {}
 
+        self._areas_df: pd.DataFrame = pd.DataFrame()
+        self._areas_boundaries_df: pd.DataFrame = pd.DataFrame()
         self._substations_df: pd.DataFrame = pd.DataFrame()
         self._voltage_levels_df: pd.DataFrame = pd.DataFrame()
 
@@ -105,6 +107,14 @@ class NetworkStructure:
         return self._network
 
     @property
+    def areas(self) -> pd.DataFrame:
+        return self._areas_df
+
+    @property
+    def areas_boundaries(self) -> pd.DataFrame:
+        return self._areas_boundaries_df
+
+    @property
     def buses(self) -> pd.DataFrame:
         return self._buses_df
 
@@ -168,6 +178,12 @@ class NetworkStructure:
         logging.info('refresh start')
 
         self._bus_breaker_topology_cache = {}
+
+        logging.info('get_areas...')
+        self._areas_df = self._network.get_areas(all_attributes=True)
+
+        logging.info('get_areas_boundaries...')
+        self._areas_boundaries_df = self._network.get_areas_boundaries(all_attributes=True)
 
         logging.info('get_substations...')
         self._substations_df = self._network.get_substations(all_attributes=True)
