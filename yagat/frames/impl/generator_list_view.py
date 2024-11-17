@@ -13,7 +13,7 @@ import pandas as pd
 import pypowsybl.network as pn
 
 from yagat.app_context import AppContext
-from yagat.frames.impl.base_list_view import BaseListView
+from yagat.frames.impl.base_list_view import BaseListView, BaseColumnFormat
 
 
 class GeneratorListView(BaseListView):
@@ -27,6 +27,9 @@ class GeneratorListView(BaseListView):
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.generators
+
+    def get_column_formats(self) -> dict[str, BaseColumnFormat]:
+        return super().get_column_formats()
 
     def on_entry(self, ident: str, column_name: str, new_value: Any):
         self.context.network.update_generators(**{'id': ident, column_name: new_value})

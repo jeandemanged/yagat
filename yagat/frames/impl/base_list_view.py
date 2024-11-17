@@ -8,7 +8,7 @@
 import logging
 import tkinter as tk
 from abc import ABC, abstractmethod
-from typing import Optional, Callable, Any
+from typing import Optional, Any
 
 import pandas as pd
 import tksheet as tks
@@ -35,8 +35,15 @@ class BaseColumnFormat(ABC):
 
 class StringColumnFormat(BaseColumnFormat):
 
-    def __init__(self, column_name: str, editable: bool = False):
+    def __init__(self, column_name: str, editable: bool = False, possible_values=None):
         BaseColumnFormat.__init__(self, column_name, editable)
+        if possible_values is None:
+            possible_values = list()
+        self._possible_values: list[str] = possible_values
+
+    @property
+    def possible_values(self) -> list[str]:
+        return self._possible_values
 
 
 class IntegerColumnFormat(BaseColumnFormat):
@@ -65,9 +72,10 @@ class BooleanColumnFormat(BaseColumnFormat):
 PRECISION_POWER = 1
 PRECISION_CURRENT = 1
 PRECISION_VOLTAGE = 2
+PRECISION_VOLTAGE_DEADBAND = PRECISION_VOLTAGE + 1
 PRECISION_ANGLE = 5
 COLUMN_FORMATS = {
-    'name': StringColumnFormat('name'),
+    'name': StringColumnFormat('name', editable=True),
     'v_mag': DoubleColumnFormat('v_mag', precision=PRECISION_VOLTAGE),
     'v_angle': DoubleColumnFormat('v_angle', precision=PRECISION_ANGLE),
     'connected_component': IntegerColumnFormat('connected_component'),
@@ -82,6 +90,7 @@ COLUMN_FORMATS = {
     'high_voltage_limit': DoubleColumnFormat('high_voltage_limit', precision=PRECISION_VOLTAGE),
     'target_p': DoubleColumnFormat('target_p', precision=PRECISION_POWER, editable=True),
     'target_v': DoubleColumnFormat('target_v', precision=PRECISION_VOLTAGE, editable=True),
+    'target_deadband': DoubleColumnFormat('target_deadband', precision=PRECISION_VOLTAGE_DEADBAND, editable=True),
     'target_q': DoubleColumnFormat('target_q', precision=PRECISION_POWER, editable=True),
     'min_p': DoubleColumnFormat('min_p', precision=PRECISION_POWER, editable=True),
     'max_p': DoubleColumnFormat('max_p', precision=PRECISION_POWER, editable=True),
@@ -91,8 +100,8 @@ COLUMN_FORMATS = {
     'boundary_q': DoubleColumnFormat('boundary_q', precision=PRECISION_POWER),
     'boundary_v_mag': DoubleColumnFormat('boundary_v_mag', precision=PRECISION_VOLTAGE),
     'boundary_v_angle': DoubleColumnFormat('boundary_v_angle', precision=PRECISION_ANGLE),
-    'p0': DoubleColumnFormat('p0', precision=PRECISION_POWER),
-    'q0': DoubleColumnFormat('q0', precision=PRECISION_POWER),
+    'p0': DoubleColumnFormat('p0', precision=PRECISION_POWER, editable=True),
+    'q0': DoubleColumnFormat('q0', precision=PRECISION_POWER, editable=True),
     'p': DoubleColumnFormat('p', precision=PRECISION_POWER),
     'q': DoubleColumnFormat('q', precision=PRECISION_POWER),
     'i': DoubleColumnFormat('i', precision=PRECISION_CURRENT),
@@ -106,7 +115,7 @@ COLUMN_FORMATS = {
     'q3': DoubleColumnFormat('q3', precision=PRECISION_POWER),
     'i3': DoubleColumnFormat('i3', precision=PRECISION_CURRENT),
     'paired': BooleanColumnFormat('paired'),
-    'fictitious': BooleanColumnFormat('fictitious'),
+    'fictitious': BooleanColumnFormat('fictitious', editable=True),
     'connected': BooleanColumnFormat('connected'),
     'connected1': BooleanColumnFormat('connected1'),
     'connected2': BooleanColumnFormat('connected2'),
@@ -114,6 +123,8 @@ COLUMN_FORMATS = {
     'open': BooleanColumnFormat('open'),
     'retained': BooleanColumnFormat('retained'),
     'voltage_regulator_on': BooleanColumnFormat('voltage_regulator_on', editable=True),
+    'voltage_regulation_on': BooleanColumnFormat('voltage_regulation_on', editable=True),
+    'section_count': IntegerColumnFormat('section_count', editable=True),
 }
 
 
@@ -166,6 +177,10 @@ class BaseListView(tk.Frame, ABC):
         return df
 
     @abstractmethod
+    def get_column_formats(self) -> dict[str, BaseColumnFormat]:
+        return COLUMN_FORMATS
+
+    @abstractmethod
     def on_entry(self, ident: str, column_name: str, new_value: Any):
         logging.warning('Update not implemented for this change')
 
@@ -182,15 +197,21 @@ class BaseListView(tk.Frame, ABC):
         self.sheet.data = [l.tolist() for l in df.to_numpy()]
         self.sheet.set_index_data(df.index.tolist())
         self.sheet.set_header_data(df.columns)
+        column_formats = self.get_column_formats()
         for idx, column_name in enumerate(df.columns):
             col = self.sheet[num2alpha(idx)]
-            if column_name not in COLUMN_FORMATS:
+            if column_name not in column_formats:
                 col.readonly(readonly=True)
                 continue
-            col_format = COLUMN_FORMATS[column_name]
+            col_format = column_formats[column_name]
             col.readonly(readonly=not col_format.editable)
             if isinstance(col_format, StringColumnFormat):
-                continue
+                if col_format.possible_values:
+                    # FIXME: didn't manage to make set_values work properly ...
+                    # k = [(i, idx) for i in range(len(df.index))]
+                    k = [i for i in range(len(df.index))]
+                    v = df.reset_index()[col_format.column_name].to_list()
+                    col.dropdown(values=col_format.possible_values, set_values=dict(zip(k, v)))
             elif isinstance(col_format, IntegerColumnFormat):
                 col.format(int_formatter())
             elif isinstance(col_format, DoubleColumnFormat):
