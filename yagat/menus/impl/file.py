@@ -14,7 +14,6 @@ import pypowsybl.network as pn
 from yagat.app_context import AppContext
 
 
-
 class FileMenu(tk.Menu):
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Menu.__init__(self, parent, *args, **kwargs)
@@ -42,7 +41,6 @@ class FileMenu(tk.Menu):
             be.merge(pn.create_micro_grid_nl_network())
             context.network = be
             context.status_text = 'Network CGMES MicroGrid BE+NL loaded'
-
 
         self.sample_networks_menu.add_command(label='IEEE 9 Bus',
                                               command=lambda: load_sample_network(pn.create_ieee9()))
@@ -77,6 +75,8 @@ class FileMenu(tk.Menu):
                                                   pn.create_four_substations_node_breaker_network_with_extensions()))
 
         self.add_separator()
+        self.add_command(label='Save...', command=self.save_network)
+        self.add_separator()
         self.add_command(
             label='Exit',
             command=context.tk_root.destroy,
@@ -90,4 +90,15 @@ class FileMenu(tk.Menu):
         else:
             self.context.status_text = 'Opening ' + filename
             self.context.network = pp.network.load(filename)
-            self.context.status_text = 'Network ' + self.context.network.name + ' loaded'
+            self.context.status_text = f'Network {self.context.network.name} loaded'
+
+    def save_network(self):
+        if not self.context.network:
+            return
+        filename = fd.asksaveasfilename()
+        if not filename:
+            self.context.status_text = 'File save cancelled by user'
+        else:
+            self.context.status_text = 'Saving ' + filename
+            self.context.network.save(filename)
+            self.context.status_text = f'Network {self.context.network.name} saved to {filename}'
