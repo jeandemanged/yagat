@@ -25,6 +25,10 @@ class SwitchListView(BaseListView):
     def tab_name(self) -> str:
         return 'Switches'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Switches List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.switches
 

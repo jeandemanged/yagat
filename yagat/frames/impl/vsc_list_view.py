@@ -23,7 +23,11 @@ class VscListView(BaseListView):
 
     @property
     def tab_name(self) -> str:
-        return 'VSC HVDC'
+        return 'VSC HVDC Converters'
+
+    @property
+    def tab_group_name(self) -> str:
+        return 'HVDC List'
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.vsc_hvdc

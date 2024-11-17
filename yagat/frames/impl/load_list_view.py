@@ -25,6 +25,10 @@ class LoadListView(BaseListView):
     def tab_name(self) -> str:
         return 'Loads'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Loads List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.loads
 

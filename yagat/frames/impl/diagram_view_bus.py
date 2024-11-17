@@ -45,6 +45,10 @@ class DiagramViewBus(VerticalScrolledFrame):
     def tab_name(self) -> str:
         return self._tab_name
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Buses Diagram'
+
     def on_selection_changed(self, selection: tuple[Optional[str], Optional[str], Optional[Connection]]):
         selection_type, selection_id, selection_connection = selection
         selected_connection_y = 0

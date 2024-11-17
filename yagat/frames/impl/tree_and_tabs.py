@@ -12,7 +12,7 @@ from yagat.frames.impl.tabs_view import TabsView
 from yagat.frames.impl.tree_view import TreeView
 
 
-class TreeAndDiagram(tk.Frame):
+class TreeAndTabs(tk.Frame):
     def __init__(self, parent, context, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -31,6 +31,6 @@ class TreeAndDiagram(tk.Frame):
 if __name__ == "__main__":
     root = tk.Tk()
     ctx = AppContext(root)
-    v = TreeAndDiagram(root, ctx)
+    v = TreeAndTabs(root, ctx)
     v.paned_window.pack(fill=tk.BOTH, expand=True)
     root.mainloop()

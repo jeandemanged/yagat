@@ -12,7 +12,7 @@ from tkinter.messagebox import showerror
 
 import yagat
 from yagat.app_context import AppContext
-from yagat.frames.impl.tree_and_diagram import TreeAndDiagram
+from yagat.frames.impl.tree_and_tabs import TreeAndTabs
 from yagat.frames.impl.status_bar import StatusBar
 from yagat.frames.impl.load_flow_parameters import LoadFlowParametersView
 from yagat.menus import MenuBar
@@ -52,7 +52,7 @@ class MainApplication(tk.Frame):
 
         self.frames = {}
 
-        self.tree_and_diagram = TreeAndDiagram(container, self.context)
+        self.tree_and_diagram = TreeAndTabs(container, self.context)
         self.tree_and_diagram.paned_window.grid(row=0, column=0, sticky="nsew")
 
         self.lfp = LoadFlowParametersView(container, self.context)
@@ -64,7 +64,7 @@ class MainApplication(tk.Frame):
         self.statusbar.pack(fill=tk.X)
 
     def on_view_changed(self, new_view):
-        if new_view == 'Diagram':
+        if new_view == 'TreeAndTabs':
             self.tree_and_diagram.paned_window.tkraise()
         elif new_view == 'LoadFlowParameters':
             self.lfp.tkraise()

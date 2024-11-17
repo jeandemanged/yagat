@@ -25,6 +25,10 @@ class StaticVarCompensatorListView(BaseListView):
     def tab_name(self) -> str:
         return 'Static VAR Compensators'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Static VAR Compensators List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.static_var_compensators
 

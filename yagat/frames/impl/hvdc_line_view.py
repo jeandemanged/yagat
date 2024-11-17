@@ -25,6 +25,10 @@ class HvdcLineView(BaseListView):
     def tab_name(self) -> str:
         return 'HVDC Lines'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'HVDC List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.hvdc_lines
 

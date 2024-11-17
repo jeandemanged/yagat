@@ -168,6 +168,11 @@ class BaseListView(tk.Frame, ABC):
     def tab_name(self) -> str:
         return 'tab name'
 
+    @property
+    @abstractmethod
+    def tab_group_name(self) -> str:
+        return 'tab group name'
+
     @abstractmethod
     def get_data_frame(self) -> pd.DataFrame:
         raise NotImplementedError

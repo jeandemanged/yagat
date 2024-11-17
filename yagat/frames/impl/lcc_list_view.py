@@ -23,7 +23,11 @@ class LccListView(BaseListView):
 
     @property
     def tab_name(self) -> str:
-        return 'LCC HVDC'
+        return 'LCC HVDC Converters'
+
+    @property
+    def tab_group_name(self) -> str:
+        return 'HVDC List'
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.lcc_hvdc

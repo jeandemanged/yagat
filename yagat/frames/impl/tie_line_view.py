@@ -25,6 +25,10 @@ class TieLineView(BaseListView):
     def tab_name(self) -> str:
         return 'Tie-Lines'
 
+    @property
+    def tab_group_name(self) -> str:
+        return 'Lines List'
+
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.tie_lines
 

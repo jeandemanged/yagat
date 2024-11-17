@@ -10,5 +10,5 @@ from .impl.main_application import MainApplication
 from .impl.splash_screen import SplashScreen
 from .impl.status_bar import StatusBar
 from .impl.tabs_view import TabsView
-from .impl.tree_and_diagram import TreeAndDiagram
+from .impl.tree_and_tabs import TreeAndTabs
 from .impl.tree_view import TreeView
