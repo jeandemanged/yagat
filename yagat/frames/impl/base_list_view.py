@@ -207,11 +207,9 @@ class BaseListView(tk.Frame, ABC):
             col.readonly(readonly=not col_format.editable)
             if isinstance(col_format, StringColumnFormat):
                 if col_format.possible_values:
-                    # FIXME: didn't manage to make set_values work properly ...
-                    # k = [(i, idx) for i in range(len(df.index))]
-                    k = [i for i in range(len(df.index))]
-                    v = df.reset_index()[col_format.column_name].to_list()
-                    col.dropdown(values=col_format.possible_values, set_values=dict(zip(k, v)))
+                    col.dropdown(values=col_format.possible_values, set_values=dict(
+                        zip([(i, idx) for i in range(len(df.index))],
+                            df.reset_index()[col_format.column_name].to_list())))
             elif isinstance(col_format, IntegerColumnFormat):
                 col.format(int_formatter())
             elif isinstance(col_format, DoubleColumnFormat):
