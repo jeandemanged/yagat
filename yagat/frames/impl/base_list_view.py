@@ -125,6 +125,11 @@ COLUMN_FORMATS = {
     'voltage_regulator_on': BooleanColumnFormat('voltage_regulator_on', editable=True),
     'voltage_regulation_on': BooleanColumnFormat('voltage_regulation_on', editable=True),
     'section_count': IntegerColumnFormat('section_count', editable=True),
+    'interchange_target': DoubleColumnFormat('interchange_target', precision=PRECISION_POWER, editable=True),
+    'interchange': DoubleColumnFormat('interchange', precision=PRECISION_POWER),
+    'ac_interchange': DoubleColumnFormat('ac_interchange', precision=PRECISION_POWER),
+    'dc_interchange': DoubleColumnFormat('dc_interchange', precision=PRECISION_POWER),
+    'ac': BooleanColumnFormat('ac'),
 }
 
 

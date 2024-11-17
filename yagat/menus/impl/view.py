@@ -38,6 +38,8 @@ class ViewMenu(tk.Menu):
                          command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'HVDC List'))
         self.add_command(label='Switches',
                          command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Switches List'))
+        self.add_command(label='Areas',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Areas List'))
         self.add_separator()
         self.add_command(label='Load Flow Parameters', command=self.view_load_flow_parameters)
 
