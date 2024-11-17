@@ -8,7 +8,7 @@ altgraph==0.17.4
     # via pyinstaller
 colorama==0.4.6
     # via pytest
-coverage[toml]==7.6.4
+coverage[toml]==7.6.7
     # via pytest-cov
 iniconfig==2.0.0
     # via pytest
@@ -31,9 +31,9 @@ pluggy==1.5.0
     # via pytest
 prettytable==3.12.0
     # via pypowsybl
-pyinstaller==6.11.0
+pyinstaller==6.11.1
     # via -r requirements.in
-pyinstaller-hooks-contrib==2024.9
+pyinstaller-hooks-contrib==2024.10
     # via pyinstaller
 pypowsybl==1.8.1
     # via -r requirements.in
@@ -51,7 +51,7 @@ pywin32-ctypes==0.2.3
     # via pyinstaller
 six==1.16.0
     # via python-dateutil
-tksheet==7.2.21
+tksheet==7.2.22
     # via -r requirements.in
 tzdata==2024.2
     # via pandas

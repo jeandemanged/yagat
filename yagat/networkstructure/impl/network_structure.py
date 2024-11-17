@@ -219,37 +219,58 @@ class NetworkStructure:
 
         logging.info('get_tie_lines...')
         self._tie_lines_df = self._network.get_tie_lines(all_attributes=True)
+
         logging.info('get_switches...')
-        self._switches_df = self._network.get_switches(all_attributes=True)
+        self._switches_df = self._network.get_switches(
+            attributes=['name', 'kind', 'open', 'retained',
+                        'bus_breaker_bus1_id', 'bus_breaker_bus2_id', 'voltage_level_id', 'fictitious'])
+
         logging.info('get_loads...')
-        self._injections_df[ns.EquipmentType.LOAD] = self._network.get_loads(all_attributes=True)
+        self._injections_df[ns.EquipmentType.LOAD] = self._network.get_loads(
+            attributes=['name', 'connected', 'type', 'p0', 'q0', 'p', 'q', 'i',
+                        'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'fictitious'])
+
         logging.info('get_generators...')
-        self._injections_df[ns.EquipmentType.GENERATOR] = self._network.get_generators(all_attributes=True)
+        self._injections_df[ns.EquipmentType.GENERATOR] = self._network.get_generators(
+            attributes=['name', 'connected', 'energy_source', 'target_p', 'min_p', 'max_p',
+                        'voltage_regulator_on', 'target_q', 'target_v', 'p', 'q', 'i',
+                        'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'fictitious'])
+
         logging.info('get_dangling_lines...')
         self._injections_df[ns.EquipmentType.DANGLING_LINE] = self._network.get_dangling_lines(
             attributes=['name', 'connected', 'p0', 'q0', 'p', 'q', 'i', 'boundary_p', 'boundary_q', 'boundary_v_mag',
                         'boundary_v_angle', 'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'pairing_key', 'paired',
-                        'tie_line_id'])
+                        'tie_line_id', 'fictitious'])
+
         logging.info('get_shunt_compensators...')
         self._injections_df[ns.EquipmentType.SHUNT_COMPENSATOR] = self._network.get_shunt_compensators(
-            all_attributes=True)
+            attributes=['name', 'connected', 'model_type', 'section_count', 'max_section_count',
+                        'voltage_regulation_on', 'target_v', 'target_deadband', 'p', 'q', 'i',
+                        'bus_id', 'bus_breaker_bus_id', 'voltage_level_id', 'fictitious'])
+
         logging.info('get_static_var_compensators...')
         self._injections_df[ns.EquipmentType.STATIC_VAR_COMPENSATOR] = self._network.get_static_var_compensators(
             all_attributes=True)
+
         logging.info('get_lcc_converter_stations...')
         self._injections_df[ns.EquipmentType.LCC_CONVERTER_STATION] = self._network.get_lcc_converter_stations(
             all_attributes=True)
+
         logging.info('get_vsc_converter_stations...')
         self._injections_df[ns.EquipmentType.VSC_CONVERTER_STATION] = self._network.get_vsc_converter_stations(
             all_attributes=True)
+
         logging.info('get_linear_shunt_compensator_sections')
         self._linear_shunt_compensator_sections_df = self._network.get_linear_shunt_compensator_sections(
             all_attributes=True)
+
         logging.info('get_non_linear_shunt_compensator_sections')
         self._non_linear_shunt_compensator_sections_df = self._network.get_non_linear_shunt_compensator_sections(
             all_attributes=True)
+
         logging.info('get_hvdc_lines')
         self._hvdc_lines_df = self._network.get_hvdc_lines(all_attributes=True)
+
         logging.info('refresh end')
 
     def __process_injection(self, injections_df, injection_type: ns.EquipmentType) -> None:

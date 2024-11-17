@@ -7,12 +7,13 @@
 #
 import os
 import tkinter as tk
+from typing import Any
 
 import pandas as pd
 import pypowsybl.network as pn
 
 from yagat.app_context import AppContext
-from yagat.frames.impl.base_list_view import BaseListView
+from yagat.frames.impl.base_list_view import BaseListView, BaseColumnFormat, StringColumnFormat
 
 
 class StaticVarCompensatorListView(BaseListView):
@@ -26,6 +27,16 @@ class StaticVarCompensatorListView(BaseListView):
 
     def get_data_frame(self) -> pd.DataFrame:
         return self.context.network_structure.static_var_compensators
+
+    def get_column_formats(self) -> dict[str, BaseColumnFormat]:
+        formats = super().get_column_formats().copy()
+        formats['regulation_mode'] = StringColumnFormat('regulation_mode', editable=True,
+                                                        possible_values=['VOLTAGE', 'REACTIVE_POWER', 'OFF'])
+        return formats
+
+    def on_entry(self, ident: str, column_name: str, new_value: Any):
+        self.context.network.update_static_var_compensators(**{'id': ident, column_name: new_value})
+        self.context.network_structure.static_var_compensators.loc[ident, column_name] = new_value
 
     def filter_data_frame(self, df: pd.DataFrame, voltage_levels: list[str]) -> pd.DataFrame:
         return df.loc[df['voltage_level_id'].isin(voltage_levels)]
