@@ -197,6 +197,9 @@ class BaseListView(tk.Frame, ABC):
         self.sheet.data = [l.tolist() for l in df.to_numpy()]
         self.sheet.set_index_data(df.index.tolist())
         self.sheet.set_header_data(df.columns)
+        self._format_columns(df)
+
+    def _format_columns(self, df):
         column_formats = self.get_column_formats()
         for idx, column_name in enumerate(df.columns):
             col = self.sheet[num2alpha(idx)]
