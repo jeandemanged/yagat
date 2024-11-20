@@ -42,6 +42,8 @@ class ViewMenu(tk.Menu):
                          command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Areas List'))
         self.add_separator()
         self.add_command(label='Load Flow Parameters', command=self.view_load_flow_parameters)
+        self.add_separator()
+        self.add_command(label='Logs', command=self.view_logs)
 
     def update_view_and_tab_group(self, view: str, tab_group: str) -> None:
         self.context.selected_view = view
@@ -49,3 +51,6 @@ class ViewMenu(tk.Menu):
 
     def view_load_flow_parameters(self):
         self.context.selected_view = 'LoadFlowParameters'
+
+    def view_logs(self):
+        self.context.selected_view = 'Logs'

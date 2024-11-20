@@ -12,7 +12,7 @@ import tkinter as tk
 
 import pypowsybl.loadflow as lf
 import tksheet as tks
-from pypowsybl._pypowsybl import BalanceType, VoltageInitMode, ConnectedComponentMode
+from pypowsybl.loadflow import BalanceType, VoltageInitMode, ConnectedComponentMode
 
 from yagat.app_context import AppContext
 
