@@ -6,11 +6,12 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 import logging
+import threading
 import tkinter as tk
 from typing import Callable, Optional
 
-import pypowsybl.network as pn
 import pypowsybl.loadflow as lf
+import pypowsybl.network as pn
 
 import yagat.networkstructure as ns
 
@@ -33,6 +34,8 @@ class AppContext:
         self.tab_group_changed_listeners: list[Callable[[str], None]] = []
         self.tab_changed_listeners: list[Callable[[str], None]] = []
         self.view_changed_listeners: list[Callable[[str], None]] = []
+        self._long_running_task: Optional[threading.Thread] = None
+        self._network_changed_listener_enabled: bool = True
 
     @property
     def tk_root(self) -> tk.Tk:
@@ -121,6 +124,8 @@ class AppContext:
         self.network_changed_listeners.append(listener)
 
     def notify_network_changed(self) -> None:
+        if not self.network_changed_listener_enabled:
+            return
         for listener in self.network_changed_listeners:
             listener(self.network)
 
@@ -153,3 +158,33 @@ class AppContext:
     def notify_view_changed(self) -> None:
         for listener in self.view_changed_listeners:
             listener(self.selected_view)
+
+    @property
+    def network_changed_listener_enabled(self) -> bool:
+        return self._network_changed_listener_enabled
+
+    @network_changed_listener_enabled.setter
+    def network_changed_listener_enabled(self, value: bool) -> None:
+        self._network_changed_listener_enabled = value
+
+    def start_long_running_task(self, name: str, target, args=(), on_done=None):
+        if self._long_running_task is not None:
+            self.status_text = 'Another task is already running, try again later'
+            return
+        self._long_running_task = threading.Thread(None, target, name, args)
+        logging.info(f'Task {self._long_running_task.name} starting')
+        self._long_running_task.start()
+
+        def schedule_check():
+            self._root.after(200, check_if_done)
+
+        def check_if_done():
+            if not self._long_running_task.is_alive():
+                logging.info(f'Task {self._long_running_task.name} completed')
+                self._long_running_task = None
+                if on_done is not None:
+                    on_done()
+            else:
+                schedule_check()
+
+        schedule_check()

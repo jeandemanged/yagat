@@ -89,8 +89,18 @@ class FileMenu(tk.Menu):
             self.context.status_text = 'File opening cancelled by user'
         else:
             self.context.status_text = 'Opening ' + filename
-            self.context.network = pp.network.load(filename)
-            self.context.status_text = f'Network {self.context.network.name} loaded'
+            # disable the network changed listener, the tree view update is messed up in GUI if updated in thread
+            self.context.network_changed_listener_enabled = False
+
+            def task():
+                self.context.network = pp.network.load(filename)
+
+            def on_done():
+                self.context.status_text = f'Network {self.context.network.name} loaded'
+                self.context.network_changed_listener_enabled = True
+                self.context.notify_network_changed()
+
+            self.context.start_long_running_task(name='Opening file', target=task, on_done=on_done)
 
     def save_network(self):
         if not self.context.network:
@@ -99,6 +109,12 @@ class FileMenu(tk.Menu):
         if not filename:
             self.context.status_text = 'File save cancelled by user'
         else:
-            self.context.status_text = 'Saving ' + filename
-            self.context.network.save(filename)
-            self.context.status_text = f'Network {self.context.network.name} saved to {filename}'
+            self.context.status_text = f'Saving {filename}'
+
+            def on_done():
+                self.context.status_text = f'Network {self.context.network.name} saved to {filename}'
+
+            def task():
+                self.context.network.save(filename)
+
+            self.context.start_long_running_task(name='Saving file', target=task, on_done=on_done)
