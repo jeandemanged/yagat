@@ -9,6 +9,10 @@ import logging
 import tkinter as tk
 
 import tksheet as tks
+from pypowsybl import _pypowsybl
+
+# we will make this configurable some day
+MAX_LOG_ROWS = 2000
 
 
 class LogsView(tk.Frame, logging.Handler):
@@ -19,6 +23,13 @@ class LogsView(tk.Frame, logging.Handler):
         logger = logging.getLogger()
         logger.addHandler(self)
         self.sheet = tks.Sheet(self, index_align='left')
+        self.sheet.hide(canvas="top_left")
+        self.sheet.hide(canvas="row_index")
+        self.sheet.font(newfont=("Monaco", 12, "normal"))
+        self.sheet.set_header_data(c=0, value="Time")
+        self.sheet.set_header_data(c=1, value="Level")
+        self.sheet.set_header_data(c=2, value="Message")
+        self.sheet['A:C'].readonly(readonly=True)
         self.sheet.enable_bindings('edit_cell',
                                    'single_select',
                                    'drag_select',
@@ -33,8 +44,15 @@ class LogsView(tk.Frame, logging.Handler):
                                    'arrowkeys',
                                    )
         self.sheet.pack(fill="both", expand=True)
+        logging.info(_pypowsybl.get_version_table())
 
     def emit(self, record):
         msg = self.format(record)
         self.sheet.insert_row(row=[record.asctime, record.levelname, msg], idx=0)
+        if record.levelname == 'WARNING':
+            self.sheet[0:1].highlight(bg="orange")
+        elif record.levelname == 'ERROR':
+            self.sheet[0:1].highlight(bg="red")
+        if len(self.sheet.data) > MAX_LOG_ROWS:
+            self.sheet.delete_row(idx=MAX_LOG_ROWS)
         self.sheet.set_all_cell_sizes_to_text()

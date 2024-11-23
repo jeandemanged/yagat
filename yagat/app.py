@@ -9,12 +9,8 @@ import logging
 import os
 import tkinter as tk
 
-import pypowsybl as pp
-
 from yagat import get_app_path
 from yagat.frames import SplashScreen, MainApplication
-
-pp.print_version()
 
 logging.getLogger('powsybl').setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
