@@ -51,7 +51,7 @@ pywin32-ctypes==0.2.3
     # via pyinstaller
 six==1.16.0
     # via python-dateutil
-tksheet==7.2.22
+tksheet==7.2.23
     # via -r requirements.in
 tzdata==2024.2
     # via pandas

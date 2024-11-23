@@ -12,9 +12,10 @@ from tkinter.messagebox import showerror
 
 import yagat
 from yagat.app_context import AppContext
-from yagat.frames.impl.tree_and_tabs import TreeAndTabs
-from yagat.frames.impl.status_bar import StatusBar
 from yagat.frames.impl.load_flow_parameters import LoadFlowParametersView
+from yagat.frames.impl.logs_view import LogsView
+from yagat.frames.impl.status_bar import StatusBar
+from yagat.frames.impl.tree_and_tabs import TreeAndTabs
 from yagat.menus import MenuBar
 from yagat.utils import get_centered_geometry
 
@@ -58,6 +59,9 @@ class MainApplication(tk.Frame):
         self.lfp = LoadFlowParametersView(container, self.context)
         self.lfp.grid(row=0, column=0, sticky="nsew")
 
+        self.logs = LogsView(container)
+        self.logs.grid(row=0, column=0, sticky="nsew")
+
         self.tree_and_diagram.paned_window.tkraise()
 
         self.statusbar = StatusBar(self.parent, self.context)
@@ -68,6 +72,8 @@ class MainApplication(tk.Frame):
             self.tree_and_diagram.paned_window.tkraise()
         elif new_view == 'LoadFlowParameters':
             self.lfp.tkraise()
+        elif new_view == 'Logs':
+            self.logs.tkraise()
         else:
             raise ValueError(f'Unknown view {new_view}')
 
