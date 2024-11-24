@@ -7,7 +7,7 @@
 #
 import os
 
-__version__ = '0.3.0'
+__version__ = '0.4.0-dev'
 
 
 def get_app_path() -> os.path:
