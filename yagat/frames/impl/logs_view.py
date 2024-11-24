@@ -22,11 +22,12 @@ class LogsView(tk.Frame, logging.Handler):
         logging.Handler.__init__(self)
         logger = logging.getLogger()
         logger.addHandler(self)
-        self.sheet = tks.Sheet(self, index_align='left')
+        self.sheet = tks.Sheet(self, index_align='left', after_redraw_time_ms=500)
         self.sheet.hide(canvas="top_left")
         self.sheet.hide(canvas="row_index")
         self.sheet.font(newfont=("Monaco", 12, "normal"))
         self.sheet.set_header_data(c=0, value="Time")
+        self.sheet.set_column_widths([240, 90, 800])
         self.sheet.set_header_data(c=1, value="Level")
         self.sheet.set_header_data(c=2, value="Message")
         self.sheet['A:C'].readonly(readonly=True)
@@ -40,6 +41,7 @@ class LogsView(tk.Frame, logging.Handler):
                                    'double_click_column_resize',
                                    'double_click_row_resize',
                                    'row_width_resize',
+                                   'row_height_resize',
                                    'column_height_resize',
                                    'arrowkeys',
                                    )
@@ -47,13 +49,12 @@ class LogsView(tk.Frame, logging.Handler):
         logging.info(_pypowsybl.get_version_table())
 
     def emit(self, record):
-        # FIXME: slowing down everything !
         msg = self.format(record)
         self.sheet.insert_row(row=[record.asctime, record.levelname, msg], idx=0)
         if record.levelname == 'WARNING':
-            self.sheet[0:1].highlight(bg="orange")
+            self.sheet[0:1].highlight(bg='gold', redraw=False)
         elif record.levelname == 'ERROR':
-            self.sheet[0:1].highlight(bg="red")
+            self.sheet[0:1].highlight(bg='salmon', redraw=False)
         if len(self.sheet.data) > MAX_LOG_ROWS:
-            self.sheet.delete_row(idx=MAX_LOG_ROWS)
-        self.sheet.set_all_cell_sizes_to_text()
+            self.sheet.delete_row(idx=MAX_LOG_ROWS, redraw=False)
+        self.sheet.set_cell_size_to_text(row=0, column=2, only_set_if_too_small=True)
