@@ -41,6 +41,9 @@ class ViewMenu(tk.Menu):
         self.add_command(label='Areas',
                          command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Areas List'))
         self.add_separator()
+        self.add_command(label='Components (Islands)',
+                         command=lambda: self.update_view_and_tab_group('TreeAndTabs', 'Components (Islands)'))
+        self.add_separator()
         self.add_command(label='Load Flow Parameters', command=self.view_load_flow_parameters)
         self.add_separator()
         self.add_command(label='Logs', command=self.view_logs)
