@@ -135,6 +135,18 @@ COLUMN_FORMATS = {
 
 class BaseListView(tk.Frame, ABC):
 
+    def sheet_selected(self, event):
+        logging.info(event)
+        if event.eventname == 'select' and event.selected and event.selected.type_ == 'rows' and event.selected.box.from_r == event.selected.box.upto_r - 1:
+            logging.info('single row')
+            x = self.winfo_pointerx()
+            y = self.winfo_pointery()
+            abs_coord_x = self.winfo_pointerx() - self.winfo_vrootx()
+            abs_coord_y = self.winfo_pointery() - self.winfo_vrooty()
+            self.popup_menu.tk_popup(abs_coord_x, abs_coord_y, 0)
+        else:
+            logging.info('other')
+
     def sheet_modified(self, event):
         if event.eventname == 'edit_table':
             row = event.selected.row
@@ -147,6 +159,9 @@ class BaseListView(tk.Frame, ABC):
 
     def __init__(self, parent, context: AppContext, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.popup_menu = tk.Menu(self, tearoff=False)
+        self.popup_menu.add_command(label="To Bus View")
+        self.popup_menu.add_command(label="To Bus/Breaker View")
         self.sheet = tks.Sheet(self, index_align='left')
         self.sheet.enable_bindings('edit_cell', 'single_select',
                                    'drag_select',
@@ -161,6 +176,7 @@ class BaseListView(tk.Frame, ABC):
                                    'arrowkeys',
                                    )
         self.sheet.bind("<<SheetModified>>", self.sheet_modified)
+        self.sheet.bind("<<SheetSelect>>", self.sheet_selected)
         self.context = context
         self.context.add_selection_changed_listener(self.on_selection_changed)
         self.context.add_tab_changed_listener(lambda _: self.on_selection_changed(self.context.selection))
