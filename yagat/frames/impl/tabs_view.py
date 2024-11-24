@@ -13,6 +13,7 @@ import pypowsybl.network as pn
 from yagat.app_context import AppContext
 from yagat.frames.impl.area_boundaries_list_view import AreaBoundariesListView
 from yagat.frames.impl.area_list_view import AreaListView
+from yagat.frames.impl.components_list_view import ComponentsListView
 from yagat.frames.impl.diagram_view_bus import DiagramViewBus
 from yagat.frames.impl.buses_bus_view_list_view import BusesListView
 from yagat.frames.impl.buses_bus_breaker_view_list_view import BusesBusBreakerViewListView
@@ -60,6 +61,7 @@ class TabsView(tk.Frame):
         self._add_tab(HvdcLineView(self.tab_control, self.context))
         self._add_tab(AreaListView(self.tab_control, self.context))
         self._add_tab(AreaBoundariesListView(self.tab_control, self.context))
+        self._add_tab(ComponentsListView(self.tab_control, self.context))
 
         self.tab_control.pack(expand=True, fill=tk.BOTH)
 

@@ -8,7 +8,9 @@
 import logging
 from typing import Dict, List, Optional, Tuple, Union
 
+import numpy as np
 import pandas as pd
+import pypowsybl.loadflow as lf
 import pypowsybl.network as pn
 
 import yagat.networkstructure as ns
@@ -37,6 +39,9 @@ class NetworkStructure:
 
         self._linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
         self._non_linear_shunt_compensator_sections_df: pd.DataFrame = pd.DataFrame()
+
+        self._components_df: pd.DataFrame = pd.DataFrame()
+        self._lf_components_results: list[lf.ComponentResult] = []
 
         self._bus_breaker_topology_cache: Dict[str, pn.BusBreakerTopology] = {}
 
@@ -107,6 +112,14 @@ class NetworkStructure:
         return self._network
 
     @property
+    def lf_components_results(self) -> list[lf.ComponentResult]:
+        return self._lf_components_results
+
+    @lf_components_results.setter
+    def lf_components_results(self, value: list[lf.ComponentResult]) -> None:
+        self._lf_components_results = value
+
+    @property
     def areas(self) -> pd.DataFrame:
         return self._areas_df
 
@@ -174,6 +187,10 @@ class NetworkStructure:
     def hvdc_lines(self) -> pd.DataFrame:
         return self._hvdc_lines_df
 
+    @property
+    def components(self) -> pd.DataFrame:
+        return self._components_df
+
     def refresh(self):
         logging.info('refresh start')
 
@@ -207,6 +224,35 @@ class NetworkStructure:
                           .reset_index()
                           .merge(tmp, left_on='voltage_level_id', right_on='id', how='left')
                           .set_index('id'))
+
+        logging.info('building components ...')
+        components = list(zip(self._buses_df.connected_component, self._buses_df.synchronous_component))
+        components.sort()
+        components = [f'CC{connected_component} SC{synchronous_component}'
+                      for (connected_component, synchronous_component) in components]
+        df = pd.DataFrame(index=components)
+        df = df[~df.index.duplicated(keep='first')]
+        new_columns = {'status': [''] * len(df),
+                       'status_text': [''] * len(df),
+                       'iteration_count': [np.nan] * len(df),
+                       'reference_bus_id': [''] * len(df),
+                       'slack_buses_ids': [''] * len(df),
+                       'active_power_mismatch': [np.nan] * len(df),
+                       'distributed_active_power': [np.nan] * len(df),
+                       }
+        self._components_df = df.assign(**new_columns)
+
+        for cr in self._lf_components_results:
+            cid = f'CC{cr.connected_component_num} SC{cr.synchronous_component_num}'
+            self._components_df.loc[cid, 'status'] = cr.status.name
+            self._components_df.loc[cid, 'status_text'] = cr.status_text
+            self._components_df.loc[cid, 'iteration_count'] = cr.iteration_count
+            self._components_df.loc[cid, 'reference_bus_id'] = cr.reference_bus_id
+            self._components_df.loc[cid, 'slack_buses_ids'] = ','.join([sbr.id for sbr in cr.slack_bus_results])
+            self._components_df.loc[cid, 'active_power_mismatch'] = (
+                sum(sbr.active_power_mismatch for sbr in cr.slack_bus_results)
+            )
+            self._components_df.loc[cid, 'distributed_active_power'] = cr.distributed_active_power
 
         logging.info('get_bus_breaker_view_buses')
         self._buses_bus_breaker_view_df = (self._network.get_bus_breaker_view_buses()

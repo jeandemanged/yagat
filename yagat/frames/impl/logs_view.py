@@ -47,6 +47,7 @@ class LogsView(tk.Frame, logging.Handler):
         logging.info(_pypowsybl.get_version_table())
 
     def emit(self, record):
+        # FIXME: slowing down everything !
         msg = self.format(record)
         self.sheet.insert_row(row=[record.asctime, record.levelname, msg], idx=0)
         if record.levelname == 'WARNING':

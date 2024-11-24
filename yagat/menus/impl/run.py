@@ -34,10 +34,14 @@ class RunMenu(tk.Menu):
 
         def task():
             if ac:
-                results = lf.run_ac(self.context.network, parameters=self.context.lf_parameters, reporter=reporter)
+                lf_components_results = lf.run_ac(self.context.network,
+                                                  parameters=self.context.lf_parameters,
+                                                  reporter=reporter)
             else:
-                results = lf.run_dc(self.context.network, parameters=self.context.lf_parameters, reporter=reporter)
-            print(results)
+                lf_components_results = lf.run_dc(self.context.network,
+                                                  parameters=self.context.lf_parameters,
+                                                  reporter=reporter)
+            self.context.network_structure.lf_components_results = lf_components_results
             print(reporter)
 
         self.context.start_long_running_task(name='Load Flow', target=task, on_done=on_done)

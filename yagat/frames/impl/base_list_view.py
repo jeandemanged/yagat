@@ -130,6 +130,9 @@ COLUMN_FORMATS = {
     'ac_interchange': DoubleColumnFormat('ac_interchange', precision=PRECISION_POWER),
     'dc_interchange': DoubleColumnFormat('dc_interchange', precision=PRECISION_POWER),
     'ac': BooleanColumnFormat('ac'),
+    'iteration_count': IntegerColumnFormat('iteration_count'),
+    'active_power_mismatch': DoubleColumnFormat('active_power_mismatch', precision=PRECISION_POWER),
+    'distributed_active_power': DoubleColumnFormat('distributed_active_power', precision=PRECISION_POWER),
 }
 
 
