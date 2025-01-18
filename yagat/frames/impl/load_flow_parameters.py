@@ -82,13 +82,15 @@ class LoadFlowParametersView(tk.Frame):
         self.variables = []
 
         i_row = 0
-        self.sheet[i_row, 0].data = 'Enable distributed slack'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.distributed_slack)
+        self.sheet[i_row, 0].data = 'SlackDistribution'
+        self.sheet[i_row, 1].data = 'Enable distributed slack'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.distributed_slack)
         self.sheet.set_index_data(r=i_row, value='distributedSlack')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Slack distribution balance type'
-        self.sheet[i_row, 1].dropdown(
+        self.sheet[i_row, 0].data = 'SlackDistribution'
+        self.sheet[i_row, 1].data = 'Slack distribution balance type'
+        self.sheet[i_row, 2].dropdown(
             values=[BalanceType.PROPORTIONAL_TO_GENERATION_P.name,
                     BalanceType.PROPORTIONAL_TO_GENERATION_P_MAX.name,
                     BalanceType.PROPORTIONAL_TO_GENERATION_PARTICIPATION_FACTOR.name,
@@ -100,13 +102,15 @@ class LoadFlowParametersView(tk.Frame):
         self.sheet.set_index_data(r=i_row, value='balanceType')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Countries to balance'
-        self.sheet[i_row, 1].data = ''
+        self.sheet[i_row, 0].data = 'SlackDistribution'
+        self.sheet[i_row, 1].data = 'Countries to balance'
+        self.sheet[i_row, 2].data = ''
         self.sheet.set_index_data(r=i_row, value='countriesToBalance')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Voltage Initialization Mode'
-        self.sheet[i_row, 1].dropdown(
+        self.sheet[i_row, 0].data = 'VoltageInit'
+        self.sheet[i_row, 1].data = 'Voltage Initialization Mode'
+        self.sheet[i_row, 2].dropdown(
             values=[VoltageInitMode.UNIFORM_VALUES.name,
                     VoltageInitMode.DC_VALUES.name,
                     VoltageInitMode.PREVIOUS_VALUES.name],
@@ -115,38 +119,45 @@ class LoadFlowParametersView(tk.Frame):
         self.sheet.set_index_data(r=i_row, value='voltageInitMode')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Read slack bus'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.read_slack_bus)
+        self.sheet[i_row, 0].data = 'SlackDistribution'
+        self.sheet[i_row, 1].data = 'Read slack bus'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.read_slack_bus)
         self.sheet.set_index_data(r=i_row, value='readSlackBus')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Write slack bus'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.write_slack_bus)
+        self.sheet[i_row, 0].data = 'SlackDistribution'
+        self.sheet[i_row, 1].data = 'Write slack bus'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.write_slack_bus)
         self.sheet.set_index_data(r=i_row, value='writeSlackBus')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Use reactive limits'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.use_reactive_limits)
+        self.sheet[i_row, 0].data = 'VoltageControls'
+        self.sheet[i_row, 1].data = 'Use reactive limits'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.use_reactive_limits)
         self.sheet.set_index_data(r=i_row, value='useReactiveLimits')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Enable Phase Shifter control'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.phase_shifter_regulation_on)
+        self.sheet[i_row, 0].data = 'PhaseControl'
+        self.sheet[i_row, 1].data = 'Enable Phase Shifter control'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.phase_shifter_regulation_on)
         self.sheet.set_index_data(r=i_row, value='phaseShifterRegulationOn')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Enable Transformer Voltage control'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.transformer_voltage_control_on)
+        self.sheet[i_row, 0].data = 'TransformerVoltageControl'
+        self.sheet[i_row, 1].data = 'Enable Transformer Voltage control'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.transformer_voltage_control_on)
         self.sheet.set_index_data(r=i_row, value='transformerVoltageControlOn')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Enable Shunt Compensator Voltage control'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.shunt_compensator_voltage_control_on)
+        self.sheet[i_row, 0].data = 'ShuntVoltageControl'
+        self.sheet[i_row, 1].data = 'Enable Shunt Compensator Voltage control'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.shunt_compensator_voltage_control_on)
         self.sheet.set_index_data(r=i_row, value='shuntCompensatorVoltageControlOn')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Connected component mode'
-        self.sheet[i_row, 1].dropdown(
+        self.sheet[i_row, 0].data = 'Performance'
+        self.sheet[i_row, 1].data = 'Connected component mode'
+        self.sheet[i_row, 2].dropdown(
             values=[ConnectedComponentMode.MAIN.name,
                     ConnectedComponentMode.ALL.name],
             set_value=self.context.lf_parameters.connected_component_mode.name
@@ -154,19 +165,22 @@ class LoadFlowParametersView(tk.Frame):
         self.sheet.set_index_data(r=i_row, value='connectedComponentMode')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Split transformers shunt admittance'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.twt_split_shunt_admittance)
+        self.sheet[i_row, 0].data = 'Model'
+        self.sheet[i_row, 1].data = 'Split transformers shunt admittance'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.twt_split_shunt_admittance)
         self.sheet.set_index_data(r=i_row, value='twtSplitShuntAdmittance')
 
         i_row += 1
-        self.sheet[i_row, 0].data = 'Ratio of transformers should be used in the flow equations in a DC power flow'
-        self.sheet[i_row, 1].checkbox(checked=self.context.lf_parameters.dc_use_transformer_ratio)
+        self.sheet[i_row, 0].data = 'DC'
+        self.sheet[i_row, 1].data = 'Ratio of transformers should be used in the flow equations in a DC power flow'
+        self.sheet[i_row, 2].checkbox(checked=self.context.lf_parameters.dc_use_transformer_ratio)
         self.sheet.set_index_data(r=i_row, value='dcUseTransformerRatio')
 
         i_row += 1
+        self.sheet[i_row, 0].data = 'DC'
         self.sheet[
-            i_row, 0].data = 'Power factor used to convert current limits into active power limits in DC calculations'
-        self.sheet[i_row, 1].data = self.context.lf_parameters.dc_power_factor
+            i_row, 1].data = 'Power factor used to convert current limits into active power limits in DC calculations'
+        self.sheet[i_row, 2].data = self.context.lf_parameters.dc_power_factor
         self.sheet.set_index_data(r=i_row, value='dcPowerFactor')
         self.sheet.format_cell(i_row, 1, formatter_options=tks.float_formatter(decimals=5))
 
@@ -174,6 +188,7 @@ class LoadFlowParametersView(tk.Frame):
             i_col = -1
             i_row += 1
             param_name = str(param_idx)
+            param_category_key = param_s.category_key
             param_description = param_s.description
             param_type = param_s.type
             param_default = param_s.default
@@ -183,6 +198,8 @@ class LoadFlowParametersView(tk.Frame):
             if param_s.possible_values and param_s.possible_values != '[]':
                 param_possible_values = param_s.possible_values[1:-1].split(', ')
 
+            i_col += 1
+            self.sheet[i_row, i_col].data = param_category_key
             i_col += 1
             self.sheet[i_row, i_col].data = '\n'.join(textwrap.wrap(param_description))
             self.sheet.set_index_data(r=i_row, value=param_name)
@@ -213,9 +230,11 @@ class LoadFlowParametersView(tk.Frame):
                 self.sheet[i_row, i_col].data = param_default
                 self.sheet.format_cell(i_row, i_col, formatter_options=tks.float_formatter(decimals=5))
 
-        self.sheet.set_header_data(c=0, value="Description")
+        self.sheet.set_header_data(c=0, value="Category")
         self.sheet["A"].readonly(readonly=True)
-        self.sheet.set_header_data(c=1, value="Value")
+        self.sheet.set_header_data(c=1, value="Description")
+        self.sheet["B"].readonly(readonly=True)
+        self.sheet.set_header_data(c=2, value="Value")
         self.sheet.set_all_cell_sizes_to_text()
         self.sheet.set_index_width(300)
         self.sheet.pack(fill="both", expand=True)
