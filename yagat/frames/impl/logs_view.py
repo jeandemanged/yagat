@@ -35,7 +35,7 @@ class LogsView(tk.Frame, logging.Handler):
         self.sheet.font(
             newfont=("Courier", 12, "normal"))  # not the best monospaced font but should work on all platforms
         self.sheet.set_header_data(c=0, value="Time")
-        self.sheet.set_column_widths([240, 90, 800])  # tksheet has typehint issue here but works
+        self.sheet.set_column_widths([240, 90, 800])
         self.sheet.set_header_data(c=1, value="Level")
         self.sheet.set_header_data(c=2, value="Message")
         self.sheet['A:C'].readonly(readonly=True)
